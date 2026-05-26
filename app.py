@@ -449,6 +449,14 @@ def _load_enriched(csv_url: str | None = None):
         }
         raw_df["email"] = raw_df["email"].replace(EMAIL_ALIASES)
         
+        # Dynamically add any unrecognized email in raw_df to TALENT_ROSTER
+        for email in raw_df["email"].dropna().unique():
+            email_clean = email.strip().lower()
+            if email_clean not in TALENT_ROSTER:
+                local_part = email_clean.split("@")[0]
+                name = local_part.replace(".", " ").replace("_", " ").strip().title()
+                TALENT_ROSTER[email_clean] = {"name": name, "client": "Unassigned / New"}
+
         # Filter strictly to active talents from the roster
         raw_df = raw_df[raw_df["email"].isin(TALENT_ROSTER.keys())]
 
@@ -677,7 +685,7 @@ if "email" not in df.columns:
 
 df["talent"] = df["email"].map(display_name)
 # All known talents from the roster
-_all_people = sorted(list({e for e in TALENT_ROSTER.keys() if e.endswith("@gettenacious.com")}))
+_all_people = sorted(list({e for e in TALENT_ROSTER.keys()}))
 # Only keep people who have submitted at least once
 _submitted_emails = set(df["email"].dropna().unique())
 people = [e for e in _all_people if e in _submitted_emails]
