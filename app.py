@@ -909,8 +909,14 @@ unique_weeks = sorted(df["week"].dropna().unique().tolist())
 unique_weeks = [w for w in unique_weeks if w and str(w) != "NaT"]
 
 # --- Session State Initialization ---
-if "view_mode" not in st.session_state:
-    st.session_state.view_mode = "Talent Weekly Status"
+if "view_mode" not in st.session_state or st.session_state.view_mode not in [
+    "Executive Dashboard",
+    "Weekly Status Board",
+    "Talent Profiles & AI Coach",
+    "Team Directory (GDoc)",
+    "Analytics & Growth Alerts"
+]:
+    st.session_state.view_mode = "Executive Dashboard"
 if "selected_talent" not in st.session_state:
     st.session_state.selected_talent = people[0] if people else None
 
@@ -919,7 +925,7 @@ if "selected_talent" in st.query_params:
     tgt_talent = st.query_params["selected_talent"]
     if tgt_talent in people:
         st.session_state.selected_talent = tgt_talent
-        st.session_state.view_mode = "Talent Profiles"
+        st.session_state.view_mode = "Talent Profiles & AI Coach"
     st.query_params.clear()
 
 # --- Sidebar Navigation ---
@@ -930,7 +936,13 @@ with st.sidebar:
     if st.session_state.selected_talent not in people and people:
         st.session_state.selected_talent = people[0]
         
-    nav_options = ["Talent Weekly Status", "Talent Profiles", "Team Directory & Contacts"]
+    nav_options = [
+        "Executive Dashboard",
+        "Weekly Status Board",
+        "Talent Profiles & AI Coach",
+        "Team Directory (GDoc)",
+        "Analytics & Growth Alerts"
+    ]
     
     view_mode = st.segmented_control(
         "Navigation",
@@ -959,11 +971,152 @@ with st.sidebar:
         
     st.caption(f"{len(people)} team members · {len(df)} check-ins")
 
-# --- VIEW: TALENT WEEKLY STATUS (LANDING PAGE) ---
-if view_mode == "Talent Weekly Status":
+# --- VIEW: EXECUTIVE DASHBOARD ---
+if view_mode == "Executive Dashboard":
     if not unique_weeks:
         st.info("No weekly data available.")
         st.stop()
+        
+    st.title("📊 Executive Dashboard")
+    st.caption("A premium overview of Tenacious Intelligence Corporation's software engineering talent operations.")
+    
+    # 1. Summary Statistics Cards
+    total_talents = len(people)
+    
+    talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
+    client_to_talents = {}
+    for e in people:
+        c = talent_to_client[e]
+        client_to_talents.setdefault(c, []).append(e)
+    total_clients = len(client_to_talents)
+    
+    strategist_cnt = 0
+    optimizer_cnt = 0
+    executor_cnt = 0
+    
+    for email in people:
+        t_all = df[df["email"] == email]
+        if not t_all.empty:
+            latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
+            tier = latest_row.get("growth_tier")
+            if tier == "TIER_STRATEGIST" or "Strategist" in str(tier):
+                strategist_cnt += 1
+            elif tier == "TIER_OPTIMIZER" or "Optimizer" in str(tier):
+                optimizer_cnt += 1
+            else:
+                executor_cnt += 1
+                
+    c1, c2, c3, c4 = st.columns(4)
+    card_style = (
+        "background:linear-gradient(135deg,#f3f2ff 0%,#ebe9ff 100%);"
+        "border:1px solid #c7c5f0;border-radius:14px;padding:18px 20px;text-align:center;"
+        "box-shadow:0 4px 16px rgba(88,91,166,0.06);"
+    )
+    with c1:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Total Talents</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{total_talents}</div></div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Active Clients</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{total_clients}</div></div>', unsafe_allow_html=True)
+    with c3:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">🧠 Strategists</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{strategist_cnt}</div></div>', unsafe_allow_html=True)
+    with c4:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">⚙️ Optimizers</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{optimizer_cnt}</div></div>', unsafe_allow_html=True)
+        
+    st.markdown("<div style='height:25px'></div>", unsafe_allow_html=True)
+    
+    # Left Column: Alerts, Right Column: Leadership
+    col_alerts, col_lead = st.columns([1.8, 1.2])
+    
+    with col_alerts:
+        st.markdown("### ⚡ Real-Time Trajectory Alerts (Rolling 4-Weeks)")
+        
+        # Compile recent alerts
+        struggles = []
+        stretch_ready = []
+        ceo_mindset = []
+        
+        for email in people:
+            t_all = df[df["email"] == email]
+            if not t_all.empty:
+                latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
+                name = name_by_email.get(email, display_name(email))
+                
+                if bool(latest_row.get("alert_silent_struggle", False)):
+                    struggles.append((name, email))
+                if bool(latest_row.get("alert_ceo_mindset_candidate", False)):
+                    ceo_mindset.append((name, email))
+                elif bool(latest_row.get("alert_ready_for_stretch", False)):
+                    stretch_ready.append((name, email))
+                    
+        if not struggles and not stretch_ready and not ceo_mindset:
+            st.markdown(
+                '<div style="background-color: #ebfbee; border: 1px solid #b2f2bb; border-radius: 12px; '
+                'padding: 1.5rem; color: #2b8a3e; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px;">'
+                '🟢 <b>All systems stable.</b> No urgent struggles or stretch opportunities require action this week.'
+                '</div>', unsafe_allow_html=True
+            )
+        else:
+            if struggles:
+                for name, email in struggles:
+                    st.markdown(
+                        f'<div style="background-color: #fee2e2; border: 1px solid #fca5a5; border-radius: 10px; '
+                        f'padding: 0.85rem 1.2rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">'
+                        f'  <div>'
+                        f'    <span style="font-weight: 700; color: #991b1b;">🚨 Silent Struggle Alert: {name}</span>'
+                        f'    <div style="font-size: 0.8rem; color: #7f1d1d; margin-top: 2px;">Completed fewer tickets than expected for consecutive weeks with minimal commentary.</div>'
+                        f'  </div>'
+                        f'  <a href="/?selected_talent={email}" target="_self" style="background-color: #991b1b; color: white; '
+                        f'    padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none;">Investigate</a>'
+                        f'</div>', unsafe_allow_html=True
+                    )
+            if ceo_mindset:
+                for name, email in ceo_mindset:
+                    st.markdown(
+                        f'<div style="background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; '
+                        f'padding: 0.85rem 1.2rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">'
+                        f'  <div>'
+                        f'    <span style="font-weight: 700; color: #92400e;">🧠 CEO Mindset Candidate: {name}</span>'
+                        f'    <div style="font-size: 0.8rem; color: #78350f; margin-top: 2px;">Exhibits exceptional growth, mastery metrics, and highly proactive pro-business commentary.</div>'
+                        f'  </div>'
+                        f'  <a href="/?selected_talent={email}" target="_self" style="background-color: #d97706; color: white; '
+                        f'    padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none;">View Profile</a>'
+                        f'</div>', unsafe_allow_html=True
+                    )
+            if stretch_ready:
+                for name, email in stretch_ready:
+                    st.markdown(
+                        f'<div style="background-color: #f3f2ff; border: 1px solid #c7c5f0; border-radius: 10px; '
+                        f'padding: 0.85rem 1.2rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">'
+                        f'  <div>'
+                        f'    <span style="font-weight: 700; color: #585ba6;">🚀 Ready for Stretch: {name}</span>'
+                        f'    <div style="font-size: 0.8rem; color: #4338ca; margin-top: 2px;">Has achieved consistent technical mastery for &ge;3 of the last 4 weeks. Ideal for Stretch/Level-Up tasks.</div>'
+                        f'  </div>'
+                        f'  <a href="/?selected_talent={email}" target="_self" style="background-color: #585ba6; color: white; '
+                        f'    padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none;">View Profile</a>'
+                        f'</div>', unsafe_allow_html=True
+                    )
+                    
+    with col_lead:
+        st.markdown("### 👑 Leadership & Core Contacts")
+        for idx, member in enumerate(leadership_contacts):
+            st.markdown(
+                f'<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 10px; '
+                f'padding: 0.85rem 1rem; box-shadow: 0 4px 6px rgba(88,91,166,0.02); margin-bottom: 0.65rem; '
+                f'display: flex; align-items: center; gap: 10px;">'
+                f'  <div style="background-color: #f3f2ff; color: #585ba6; border-radius: 50%; '
+                f'    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; '
+                f'    font-weight: 700; font-size: 0.85rem;">'
+                f'    {member["name"][0]}'
+                f'  </div>'
+                f'  <div>'
+                f'    <div style="font-weight: 700; color: #1e293b; font-size: 0.88rem; line-height: 1.1;">{member["name"]}</div>'
+                f'    <div style="font-size: 0.72rem; color: #64748b;">{member["role"]} · {member["email"]}</div>'
+                f'  </div>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+            
+# --- VIEW: WEEKLY STATUS BOARD ---
+elif view_mode == "Weekly Status Board":
         
     # Maintain selected week in session state
     if "week_idx" not in st.session_state:
@@ -1268,7 +1421,7 @@ if view_mode == "Talent Weekly Status":
                     st.metric("First-Pass QA %", qa_val)
 
 # --- VIEW: TALENT PROFILES ---
-elif view_mode == "Talent Profiles":
+elif view_mode == "Talent Profiles & AI Coach":
     # Sidebar Profile selection grouped by Client
     with st.sidebar:
         st.subheader("Select Talent Profile")
@@ -1725,9 +1878,9 @@ elif view_mode == "Talent Profiles":
     else:
         st.info("No detailed check-in submissions have been submitted by this talent yet.")
 
-# --- VIEW: TEAM DIRECTORY & CONTACTS ---
-elif view_mode == "Team Directory & Contacts":
-    st.title("👤 Tenacious Team Directory & Key Contacts")
+# --- VIEW: TEAM DIRECTORY (GDOC) ---
+elif view_mode == "Team Directory (GDoc)":
+    st.title("👤 Team Directory")
     st.caption("A dynamic, automatically updating index of all active software talents and their current client placements.")
     
     # 1. Summary Statistics Cards
@@ -1866,7 +2019,157 @@ elif view_mode == "Team Directory & Contacts":
                 if st.button(f"🔍 View {name}'s Profile", key=f"btn_{email}", use_container_width=True):
                     st.session_state.selected_talent = email
                     st.session_state.selected_client = client_name
-                    st.session_state.view_mode = "Talent Profiles"
+                    st.session_state.view_mode = "Talent Profiles & AI Coach"
                     st.rerun()
                     
         st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+
+# --- VIEW: ANALYTICS & GROWTH ALERTS ---
+elif view_mode == "Analytics & Growth Alerts":
+    st.title("📈 Analytics & Growth Alerts")
+    st.caption("Longitudinal rolling 4-week automated performance evaluations and growth alerts.")
+    
+    st.markdown("### 🏆 Automated Growth Tiers & Alerts Summary")
+    
+    growth_records = []
+    for email in people:
+        t_all = df[df["email"] == email]
+        name = name_by_email.get(email, display_name(email))
+        client_name = TALENT_ROSTER.get(email, {}).get("client", "Unassigned")
+        
+        latest_status = "Incomplete Metrics"
+        status_css = "status-incomplete"
+        tier_lbl = "Executor"
+        tier_emoji = "✅"
+        
+        silent_struggle = False
+        ready_stretch = False
+        ceo_mindset = False
+        
+        if not t_all.empty:
+            latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
+            lbl, emoji_s, css_class, explanation = generate_hr_explanation(latest_row)
+            latest_status = lbl
+            status_css = css_class
+            
+            raw_tier = latest_row.get("growth_tier", "TIER_EXECUTOR")
+            if raw_tier == "TIER_STRATEGIST" or "Strategist" in str(raw_tier):
+                tier_lbl = "Strategist"
+                tier_emoji = "🧠"
+            elif raw_tier == "TIER_OPTIMIZER" or "Optimizer" in str(raw_tier):
+                tier_lbl = "Optimizer"
+                tier_emoji = "⚙️"
+                
+            silent_struggle = bool(latest_row.get("alert_silent_struggle", False))
+            ready_stretch = bool(latest_row.get("alert_ready_for_stretch", False))
+            ceo_mindset = bool(latest_row.get("alert_ceo_mindset_candidate", False))
+            
+        growth_records.append({
+            "Talent": name,
+            "Email": email,
+            "Client Placement": client_name,
+            "Growth Tier": f"{tier_emoji} {tier_lbl}",
+            "Weekly Status": latest_status,
+            "status_css": status_css,
+            "Stretch Opportunity": "🚀 Stretch Ready" if ready_stretch else "SLA Solid",
+            "CEO Potential": "🌟 CEO Mindset" if ceo_mindset else "No Alert",
+            "Silent Struggle": "🚨 Silent Struggle" if silent_struggle else "Stable",
+            "silent_struggle": silent_struggle,
+            "ready_stretch": ready_stretch,
+            "ceo_mindset": ceo_mindset
+        })
+        
+    growth_df = pd.DataFrame(growth_records)
+    
+    # Render table in high fidelity HTML
+    import html
+    html_lines = []
+    html_lines.append('<div class="custom-table-container">')
+    html_lines.append('  <table class="custom-table">')
+    html_lines.append('    <thead>')
+    html_lines.append('      <tr>')
+    html_lines.append('        <th>Talent</th>')
+    html_lines.append('        <th>Client Placement</th>')
+    html_lines.append('        <th>Weekly Status</th>')
+    html_lines.append('        <th>Growth Tier</th>')
+    html_lines.append('        <th>Stretch Level-Up?</th>')
+    html_lines.append('        <th>Silent Struggle?</th>')
+    html_lines.append('        <th>CEO Potential?</th>')
+    html_lines.append('      </tr>')
+    html_lines.append('    </thead>')
+    html_lines.append('    <tbody>')
+    
+    for idx, row in growth_df.iterrows():
+        html_lines.append('      <tr>')
+        # Talent Name Link
+        cell_link = f'<a href="/?selected_talent={row["Email"]}" target="_self" class="cell-link" style="color: #585ba6 !important; font-weight: 600;">👤 {html.escape(row["Talent"])}</a>'
+        html_lines.append(f'        <td class="talent-td nowrap-column">{cell_link}</td>')
+        # Client Link
+        client_link = f'<a href="/?selected_talent={row["Email"]}" target="_self" class="cell-link">{html.escape(row["Client Placement"])}</a>'
+        html_lines.append(f'        <td>{client_link}</td>')
+        # Weekly Status Badge
+        status_badge = f'<span class="hr-badge {row["status_css"]}" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem;">{row["Weekly Status"]}</span>'
+        html_lines.append(f'        <td>{status_badge}</td>')
+        # Growth Tier
+        tier_link = f'<a href="/?selected_talent={row["Email"]}" target="_self" class="cell-link" style="font-weight: 600; color: #1e3b70;">{html.escape(row["Growth Tier"])}</a>'
+        html_lines.append(f'        <td>{tier_link}</td>')
+        
+        # Stretch Ready
+        if row["ready_stretch"]:
+            stretch_badge = '<span class="hr-badge status-excelling" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem;">🚀 Stretch Ready</span>'
+        else:
+            stretch_badge = '<span class="hr-badge status-incomplete" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #64748b;">SLA Baseline</span>'
+        html_lines.append(f'        <td>{stretch_badge}</td>')
+        
+        # Silent Struggle
+        if row["silent_struggle"]:
+            struggle_badge = '<span class="hr-badge status-concern" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem;">🚨 Struggling</span>'
+        else:
+            struggle_badge = '<span class="hr-badge status-solid" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #0c8599;">Stable</span>'
+        html_lines.append(f'        <td>{struggle_badge}</td>')
+        
+        # CEO Mindset
+        if row["ceo_mindset"]:
+            ceo_badge = '<span class="hr-badge status-mixed" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #b45309;">🌟 Candidate</span>'
+        else:
+            ceo_badge = '<span style="color:#aaa; font-size: 0.8rem; padding-left: 20px;">None</span>'
+        html_lines.append(f'        <td>{ceo_badge}</td>')
+        
+        html_lines.append('      </tr>')
+        
+    html_lines.append('    </tbody>')
+    html_lines.append('  </table>')
+    html_lines.append('</div>')
+    
+    st.markdown("\n".join(html_lines), unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # ── Growth Signal & Tier Specifications Reference
+    c_tier, c_alert = st.columns(2)
+    with c_tier:
+        st.markdown(
+            '<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; height: 100%; box-shadow: 0 4px 6px rgba(88,91,166,0.02);">'
+            '  <h4 style="color:#585ba6; font-weight:700; margin-top:0;">🛡️ Performance Growth Tiers</h4>'
+            '  <p style="font-size:0.85rem; color:#64748b; margin-bottom: 1.25rem;">Automated classification determined on ingested performance metrics:</p>'
+            '  <ul style="font-size:0.85rem; color:#475569; padding-left: 20px; line-height: 1.6;">'
+            '    <li><b>🧠 TIER_STRATEGIST:</b> Technical mastery (tickets done &ge; expected & QA &ge; 95%) combined with high proactivity (extra-mile insights or artifacts).</li>'
+            '    <li><b>⚙️ TIER_OPTIMIZER:</b> Technical mastery achieved OR detailed escalation commentary despite missed baseline targets.</li>'
+            '    <li><b>✅ TIER_EXECUTOR:</b> Meeting general expectations and baseline performance targets stably.</li>'
+            '  </ul>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    with c_alert:
+        st.markdown(
+            '<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; height: 100%; box-shadow: 0 4px 6px rgba(88,91,166,0.02);">'
+            '  <h4 style="color:#585ba6; font-weight:700; margin-top:0;">📡 Longitudinal Trajectory Alerts</h4>'
+            '  <p style="font-size:0.85rem; color:#64748b; margin-bottom: 1.25rem;">Evaluated using a rolling 4-week context window to flag systemic changes:</p>'
+            '  <ul style="font-size:0.85rem; color:#475569; padding-left: 20px; line-height: 1.6;">'
+            '    <li><b>🚀 Stretch Ready:</b> Outperforming baseline SLA (Mastery achieved) in &ge; 3 of the last 4 weeks. Candidate for level-up.</li>'
+            '    <li><b>🚨 Silent Struggle:</b> Underperforming ticket expectations for 2 consecutive weeks with minimal check-in commentary.</li>'
+            '    <li><b>🌟 CEO Mindset:</b> Outstanding level-up candidate demonstrating exceptional proactivity and stretch readiness for consecutive weeks.</li>'
+            '  </ul>'
+            '</div>',
+            unsafe_allow_html=True
+        )
