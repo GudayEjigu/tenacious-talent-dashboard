@@ -242,7 +242,7 @@ st.markdown(
         font-family: 'Montserrat', sans-serif !important;
     }
 
-    [data-testid="stAppViewContainer"] {
+    .main, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"] {
         background-color: #f8fafc !important;
     }
 
