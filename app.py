@@ -717,7 +717,7 @@ with st.sidebar:
     if st.session_state.selected_talent not in people and people:
         st.session_state.selected_talent = people[0]
         
-    nav_options = ["Talent Weekly Status", "Talent Profiles"]
+    nav_options = ["Talent Weekly Status", "Talent Profiles", "Team Directory & Contacts"]
     
     view_mode = st.segmented_control(
         "Navigation",
@@ -1511,3 +1511,117 @@ elif view_mode == "Talent Profiles":
                     st.markdown(" · ".join(nums))
     else:
         st.info("No detailed check-in submissions have been submitted by this talent yet.")
+
+# --- VIEW: TEAM DIRECTORY & CONTACTS ---
+elif view_mode == "Team Directory & Contacts":
+    st.title("👤 Tenacious Team Directory & Key Contacts")
+    st.caption("A dynamic, automatically updating index of all active software talents and their current client placements.")
+    
+    # 1. Summary Statistics Cards
+    total_talents = len(people)
+    
+    talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
+    client_to_talents = {}
+    for e in people:
+        c = talent_to_client[e]
+        client_to_talents.setdefault(c, []).append(e)
+    total_clients = len(client_to_talents)
+    
+    strategist_cnt = 0
+    optimizer_cnt = 0
+    executor_cnt = 0
+    
+    for email in people:
+        t_all = df[df["email"] == email]
+        if not t_all.empty:
+            latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
+            tier = latest_row.get("growth_tier")
+            if tier == "TIER_STRATEGIST" or "Strategist" in str(tier):
+                strategist_cnt += 1
+            elif tier == "TIER_OPTIMIZER" or "Optimizer" in str(tier):
+                optimizer_cnt += 1
+            else:
+                executor_cnt += 1
+                
+    c1, c2, c3, c4 = st.columns(4)
+    card_style = (
+        "background:linear-gradient(135deg,#f3f2ff 0%,#ebe9ff 100%);"
+        "border:1px solid #c7c5f0;border-radius:14px;padding:15px;text-align:center;"
+        "box-shadow:0 4px 12px rgba(88,91,166,0.06);"
+    )
+    with c1:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">Total Talents</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{total_talents}</div></div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">Active Clients</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{total_clients}</div></div>', unsafe_allow_html=True)
+    with c3:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">🧠 Strategists</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{strategist_cnt}</div></div>', unsafe_allow_html=True)
+    with c4:
+        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">⚙️ Optimizers</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{optimizer_cnt}</div></div>', unsafe_allow_html=True)
+        
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+    
+    # 2. Render each Client's team roster
+    for client_name in sorted(client_to_talents.keys()):
+        st.markdown(f"### 🏢 {client_name} Team")
+        talents_in_client = client_to_talents[client_name]
+        
+        # Flex layout cards grouped in streamlit columns
+        cols = st.columns(3)
+        for i, email in enumerate(talents_in_client):
+            col_idx = i % 3
+            with cols[col_idx]:
+                name = name_by_email[email]
+                
+                t_all = df[df["email"] == email]
+                latest_status = "Incomplete Metrics"
+                status_css = "status-incomplete"
+                tier_lbl = "Executor"
+                tier_emoji = "✅"
+                
+                if not t_all.empty:
+                    latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
+                    lbl, emoji_s, css_class, explanation = generate_hr_explanation(latest_row)
+                    latest_status = lbl
+                    status_css = css_class
+                    
+                    raw_tier = latest_row.get("growth_tier", "TIER_EXECUTOR")
+                    if raw_tier == "TIER_STRATEGIST" or "Strategist" in str(raw_tier):
+                        tier_lbl = "Strategist"
+                        tier_emoji = "🧠"
+                    elif raw_tier == "TIER_OPTIMIZER" or "Optimizer" in str(raw_tier):
+                        tier_lbl = "Optimizer"
+                        tier_emoji = "⚙️"
+                
+                st.markdown(
+                    f'<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 12px; '
+                    f'padding: 1.25rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 0.5rem; '
+                    f'display: flex; flex-direction: column; justify-content: space-between; height: 145px;">'
+                    f'<div>'
+                    f'  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">'
+                    f'    <div style="background-color: #f3f2ff; color: #585ba6; border-radius: 50%; '
+                    f'      width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; '
+                    f'      font-weight: 700; font-size: 0.95rem;">'
+                    f'      {name[0]}'
+                    f'    </div>'
+                    f'    <div>'
+                    f'      <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem; line-height: 1.2;">{name}</div>'
+                    f'      <div style="font-size: 0.75rem; color: #64748b;">{email}</div>'
+                    f'    </div>'
+                    f'  </div>'
+                    f'  <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">'
+                    f'    <span style="font-size: 0.8rem; font-weight: 600; color: #475569;">Tier: {tier_emoji} {tier_lbl}</span>'
+                    f'    <span class="hr-badge {status_css}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-bottom: 0px;">{latest_status}</span>'
+                    f'  </div>'
+                    f'</div>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+                
+                # Dynamic navigation button
+                if st.button(f"🔍 View {name}'s Profile", key=f"btn_{email}", use_container_width=True):
+                    st.session_state.selected_talent = email
+                    st.session_state.selected_client = client_name
+                    st.session_state.view_mode = "Talent Profiles"
+                    st.rerun()
+                    
+        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
