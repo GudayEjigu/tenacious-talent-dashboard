@@ -227,7 +227,7 @@ except Exception:
 
 st.set_page_config(
     page_title="Talent management weekly overview",
-    page_icon="👤",
+    page_icon="icon.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -240,6 +240,15 @@ st.markdown(
     
     html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"], [data-testid="stHeader"], [data-testid="stMarkdownContainer"], button, input, select, textarea, table, td, th, p, h1, h2, h3, h4, h5, h6 {
         font-family: 'Montserrat', sans-serif !important;
+    }
+
+    [data-testid="stAppViewContainer"] {
+        background-color: #f8fafc !important;
+    }
+
+    [data-testid="stHeader"] {
+        background-color: rgba(248, 250, 252, 0.95) !important;
+        backdrop-filter: blur(8px) !important;
     }
 
     /* Prevent icon fonts from being overridden by Montserrat */
