@@ -21,6 +21,210 @@ import os
 
 DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTHOdZugsQlciIwFckKYXqHGn8NBlXdLHJwFf3KxuabSdtXX6rlunWMx7yegMiQK6cSckTTiX6ISsH4/pub?gid=0&single=true&output=csv"
 
+# --- Dynamic Google Doc Roster Parser ---
+def guess_email(name: str) -> str:
+    clean = name.strip().lower()
+    if "arun" in clean: return "arun@gettenacious.com"
+    if "yabebal" in clean: return "yabebal@gettenacious.com"
+    if "bereket" in clean: return "bereket@gettenacious.com"
+    if "bezawit" in clean: return "bezawit@gettenacious.com"
+    if "guday" in clean: return "guday@gettenacious.com"
+    if "maureen" in clean: return "maureen@gettenacious.com"
+    
+    # Technical team
+    if "nabil" in clean: return "nabil@gettenacious.com"
+    if "yosef" in clean: return "yosef@gettenacious.com"
+    if "dibora" in clean: return "dibora@gettenacious.com"
+    if "jabez" in clean: return "jabez@gettenacious.com"
+    if "rahel" in clean: return "rahel@gettenacious.com"
+    if "milky" in clean: return "milky@gettenacious.com"
+    if "mahlet" in clean: return "mahlet@gettenacious.com"
+    if "rediet" in clean: return "rediet@gettenacious.com"
+    if "yohanes teshome" in clean: return "yohanes@gettenacious.com"
+    if "daniel" in clean: return "daniel@gettenacious.com"
+    if "nahom habtamu" in clean or "nahom habt" in clean: return "nahom@gettenacious.com"
+    if "nahom bekele" in clean: return "nahomb@gettenacious.com"
+    if "zelalem" in clean: return "zelalem@gettenacious.com"
+    if "belay" in clean: return "belay@gettenacious.com"
+    if "birhanu" in clean: return "birhanu@gettenacious.com"
+    if "mama" in clean: return "mama@gettenacious.com"
+    if "samuel" in clean: return "samuel@gettenacious.com"
+    if "nardos" in clean: return "nardos@gettenacious.com"
+    if "lillian" in clean: return "lillian@gettenacious.com"
+    if "nebiyou" in clean: return "nebiyou@gettenacious.com"
+    if "dereje" in clean: return "dereje@gettenacious.com"
+    if "alazar" in clean: return "alazar@gettenacious.com"
+    if "miliyon" in clean: return "miliyon@gettenacious.com"
+    if "meron" in clean: return "meron@gettenacious.com"
+    if "fikerte" in clean: return "fikerte@gettenacious.com"
+    if "tesfaye" in clean: return "tesfaye@gettenacious.com"
+    if "yohans samuel" in clean: return "yohans@gettenacious.com"
+    if "akubazgi" in clean: return "akubazgi@gettenacious.com"
+    if "filimon" in clean: return "filimon@gettenacious.com"
+    if "sumeya" in clean: return "sumeya@gettenacious.com"
+    if "tadesse" in clean: return "tadesse@gettenacious.com"
+    if "ekram" in clean: return "ekram@gettenacious.com"
+    if "estifanos" in clean: return "estifanos@gettenacious.com"
+    
+    parts = clean.split()
+    first = parts[0] if parts else "unknown"
+    return f"{first}@gettenacious.com"
+
+@st.cache_data(ttl=600, show_spinner="Fetching latest roster from Google Doc…")
+def load_roster_from_gdoc() -> tuple[dict, list]:
+    fallback_roster = {
+        "nabil@gettenacious.com": {"name": "Nabil Seid", "client": "Ozone"},
+        "yosef@gettenacious.com": {"name": "Yosef Engdawork", "client": "Ozone"},
+        "dibora@gettenacious.com": {"name": "Dibora Haile", "client": "Ozone"},
+        "jabez@gettenacious.com": {"name": "Jabez Kassa", "client": "Ozone"},
+        "rahel@gettenacious.com": {"name": "Rahel Weldegebriel", "client": "Ozone"},
+        "milky@gettenacious.com": {"name": "Milky Bekele", "client": "Ozone"},
+        "mahlet@gettenacious.com": {"name": "Mahlet Taye", "client": "Ozone"},
+        "rediet@gettenacious.com": {"name": "Rediet Girma", "client": "Ozone"},
+        "yohanes@gettenacious.com": {"name": "Yohanes Teshome", "client": "Ozone"},
+        "daniel@gettenacious.com": {"name": "Daniel Zelalem", "client": "Ozone"},
+        "nahom@gettenacious.com": {"name": "Nahom Habtamu", "client": "Computrition"},
+        "nahom.fix@gmail.com": {"name": "Nahom Habtamu", "client": "Computrition"},
+        "zelalem@gettenacious.com": {"name": "Zelalem Getahun", "client": "Computrition"},
+        "belay@gettenacious.com": {"name": "Belay Birhanu", "client": "Computrition"},
+        "belay@10academy.org": {"name": "Belay Birhanu", "client": "Computrition"},
+        "birhanu@gettenacious.com": {"name": "Birhanu Gudisa", "client": "Computrition"},
+        "nahomb@gettenacious.com": {"name": "Nahom Bekele", "client": "Computrition"},
+        "mama@gettenacious.com": {"name": "Mama Mohammed", "client": "Computrition"},
+        "mamamohammed31@gmail.com": {"name": "Mama Mohammed", "client": "Computrition"},
+        "samuel@gettenacious.com": {"name": "Samuel Negash", "client": "RewardOps"},
+        "smlnegash@gmail.com": {"name": "Samuel Negash", "client": "RewardOps"},
+        "nardos@gettenacious.com": {"name": "Nardos Tilahun", "client": "RewardOps"},
+        "lillian@gettenacious.com": {"name": "Lillian Alehegn", "client": "RewardOps"},
+        "lillianalehegn123@gmail.com": {"name": "Lillian Alehegn", "client": "RewardOps"},
+        "nebiyou@gettenacious.com": {"name": "Nebiyou Belaineh", "client": "RewardOps"},
+        "dereje@gettenacious.com": {"name": "Dereje Derib", "client": "RewardOps"},
+        "alazar@gettenacious.com": {"name": "Alazar Getachew", "client": "Vanson Technology Services"},
+        "alazar.getachew@coraloyalty.com": {"name": "Alazar Getachew", "client": "Vanson Technology Services"},
+        "miliyon@gettenacious.com": {"name": "Miliyon Ayalew", "client": "Vanson Technology Services"},
+        "meron@gettenacious.com": {"name": "Meron Abdo", "client": "Modo Yoga"},
+        "meronabdo954@gmail.com": {"name": "Meron Abdo", "client": "Modo Yoga"},
+        "fikerte@gettenacious.com": {"name": "Fikerte Alemayehu", "client": "MIR Digital"},
+        "tesfaye@gettenacious.com": {"name": "Tesfaye Alemayehu", "client": "Shega"},
+        "yohans@gettenacious.com": {"name": "Yohans Samuel", "client": "Navigate"},
+        "akubazgi@gettenacious.com": {"name": "Akubazgi Gebremariam", "client": "SCG"},
+        "filimon@gettenacious.com": {"name": "Filimon Haylemariam", "client": "Carlson"},
+        "sumeya@gettenacious.com": {"name": "Sumeya Sirmula", "client": "Tech"},
+        "tadesse@gettenacious.com": {"name": "Tadesse Abateneh Walelign", "client": "Modo"},
+        "ekram@gettenacious.com": {"name": "Ekram Kumdin", "client": "Modo"},
+        "estifanos@gettenacious.com": {"name": "Estifanos Teklay", "client": "Modo"},
+    }
+    
+    fallback_leadership = [
+        {"name": "Arun Sharma", "role": "Co-founder", "email": "arun@gettenacious.com"},
+        {"name": "Yabebal Fantaye", "role": "Co-founder", "email": "yabebal@gettenacious.com"},
+        {"name": "Bereket Kibru", "role": "Technical Client Delivery Manager", "email": "bereket@gettenacious.com"},
+        {"name": "Bezawit Wondwosen", "role": "Project Manager", "email": "bezawit@gettenacious.com"},
+        {"name": "Guday Berhanu", "role": "Talent Manager", "email": "guday@gettenacious.com"},
+        {"name": "Tesfaye Alemayehu", "role": "Tenacious Internal Tech Team", "email": "tesfaye@gettenacious.com"},
+        {"name": "Maureen Kiprono", "role": "Finance Manager", "email": "maureen@gettenacious.com"},
+    ]
+    
+    gdoc_url = "https://docs.google.com/document/d/1F4VTDDU6lMLorgEjucZCmPlUHf0OC3BkRyQUXrf9nd4/export?format=txt"
+    try:
+        import urllib.request
+        import ssl
+        import certifi
+        
+        ctx = ssl.create_default_context(cafile=certifi.where())
+        request = urllib.request.Request(gdoc_url, headers={"User-Agent": "TenaciousGrowthDashboard/1.0"})
+        with urllib.request.urlopen(request, context=ctx, timeout=10) as response:
+            text = response.read().decode("utf-8", errors="replace")
+            
+        lines = [line.strip() for line in text.splitlines()]
+        
+        parsed_roster = {}
+        parsed_leadership = []
+        
+        lead_start = -1
+        tech_start = -1
+        tech_end = -1
+        
+        for i, line in enumerate(lines):
+            if "Leadership & Core Team:" in line:
+                lead_start = i
+            elif "Technical Team (Consultants" in line:
+                tech_start = i
+            elif "You don’t need to memorize" in line:
+                tech_end = i
+                
+        if lead_start != -1 and tech_start != -1:
+            i = lead_start + 1
+            while i < tech_start:
+                line = lines[i]
+                if line.lower() in ("name", "role", "") or not line.strip():
+                    i += 1
+                    continue
+                if i + 1 < tech_start:
+                    name = line.strip().replace("\t", "")
+                    role = lines[i+1].strip().replace("\t", "")
+                    email = guess_email(name)
+                    parsed_leadership.append({"name": name, "role": role, "email": email})
+                    i += 2
+                else:
+                    i += 1
+                    
+        if tech_start != -1:
+            end_limit = tech_end if tech_end != -1 else len(lines)
+            i = tech_start + 1
+            while i < end_limit:
+                line = lines[i]
+                if line.lower() in ("name", "client", "") or not line.strip():
+                    i += 1
+                    continue
+                if i + 1 < end_limit:
+                    name = line.strip().replace("\t", "")
+                    client = lines[i+1].strip().replace("\t", "")
+                    
+                    # Normalize client names
+                    if "ozone" in client.lower(): client = "Ozone"
+                    elif "computrition" in client.lower(): client = "Computrition"
+                    elif "rewardops" in client.lower(): client = "RewardOps"
+                    elif "vanson" in client.lower(): client = "Vanson Technology Services"
+                    elif "modo yoga" in client.lower(): client = "Modo Yoga"
+                    elif "modo" in client.lower(): client = "Modo"
+                    elif "mir" in client.lower(): client = "MIR Digital"
+                    elif "shega" in client.lower(): client = "Shega"
+                    elif "navigate" in client.lower(): client = "Navigate"
+                    elif "scg" in client.lower(): client = "SCG"
+                    elif "carlson" in client.lower(): client = "Carlson"
+                    elif "tech" in client.lower(): client = "Tech"
+                    
+                    email = guess_email(name)
+                    parsed_roster[email] = {"name": name, "client": client}
+                    i += 2
+                else:
+                    i += 1
+                    
+        if parsed_roster:
+            return parsed_roster, parsed_leadership
+            
+    except Exception as e:
+        pass
+        
+    return fallback_roster, fallback_leadership
+
+# Execute dynamically at startup to populate imported weekly_checks.TALENT_ROSTER
+try:
+    gdoc_roster, leadership_contacts = load_roster_from_gdoc()
+    TALENT_ROSTER.clear()
+    TALENT_ROSTER.update(gdoc_roster)
+except Exception:
+    leadership_contacts = [
+        {"name": "Arun Sharma", "role": "Co-founder", "email": "arun@gettenacious.com"},
+        {"name": "Yabebal Fantaye", "role": "Co-founder", "email": "yabebal@gettenacious.com"},
+        {"name": "Bereket Kibru", "role": "Technical Client Delivery Manager", "email": "bereket@gettenacious.com"},
+        {"name": "Bezawit Wondwosen", "role": "Project Manager", "email": "bezawit@gettenacious.com"},
+        {"name": "Guday Berhanu", "role": "Talent Manager", "email": "guday@gettenacious.com"},
+        {"name": "Tesfaye Alemayehu", "role": "Tenacious Internal Tech Team", "email": "tesfaye@gettenacious.com"},
+        {"name": "Maureen Kiprono", "role": "Finance Manager", "email": "maureen@gettenacious.com"},
+    ]
+
 st.set_page_config(
     page_title="Talent management weekly overview",
     page_icon="👤",
@@ -1559,6 +1763,38 @@ elif view_mode == "Team Directory & Contacts":
         st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">⚙️ Optimizers</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{optimizer_cnt}</div></div>', unsafe_allow_html=True)
         
     st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+    
+    # 1.5 Leadership & Core Contacts
+    st.markdown("### 👑 Leadership & Core Contacts")
+    
+    lead_cols = st.columns(4)
+    for idx, member in enumerate(leadership_contacts):
+        col_idx = idx % 4
+        with lead_cols[col_idx]:
+            st.markdown(
+                f'<div style="background-color: #f8fafc; border: 1px solid #c7c5f0; border-radius: 12px; '
+                f'padding: 1rem; box-shadow: 0 4px 6px rgba(88,91,166,0.04); margin-bottom: 1rem; '
+                f'display: flex; flex-direction: column; justify-content: space-between; height: 130px;">'
+                f'<div>'
+                f'  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">'
+                f'    <div style="background-color: #585ba6; color: white; border-radius: 50%; '
+                f'      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; '
+                f'      font-weight: 700; font-size: 0.9rem;">'
+                f'      {member["name"][0]}'
+                f'    </div>'
+                f'    <div>'
+                f'      <div style="font-weight: 700; color: #1e3b70; font-size: 0.9rem; line-height: 1.1;">{member["name"]}</div>'
+                f'      <div style="font-size: 0.72rem; color: #64748b;">{member["email"]}</div>'
+                f'    </div>'
+                f'  </div>'
+                f'  <div style="margin-top: 8px; font-size: 0.78rem; font-weight: 600; color: #475569;">'
+                f'    Role: {member["role"]}'
+                f'  </div>'
+                f'</div>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+    st.markdown("<hr style='border-top:1px solid #e2e8f0; margin:1.5rem 0;' />", unsafe_allow_html=True)
     
     # 2. Render each Client's team roster
     for client_name in sorted(client_to_talents.keys()):
