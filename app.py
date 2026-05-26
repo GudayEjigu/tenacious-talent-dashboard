@@ -17,6 +17,9 @@ from weekly_checks import (
 import notables
 import scoring
 import growth_signal_engine
+import os
+
+DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTHOdZugsQlciIwFckKYXqHGn8NBlXdLHJwFf3KxuabSdtXX6rlunWMx7yegMiQK6cSckTTiX6ISsH4/pub?gid=0&single=true&output=csv"
 
 st.set_page_config(
     page_title="Talent management weekly overview",
@@ -581,18 +584,86 @@ def get_sort_weight(row: pd.Series) -> int:
 
 
 # --- Load & Clean Data ---
-try:
-    df, parse_info = _load_enriched()
-except Exception as e:
-    st.error(f"Could not load sheet: {e}")
-    override = st.text_input("Published CSV URL", value=get_secret("sheet_csv_url", ""))
-    if override:
+# Initialize session state variables for uploaded data
+if "uploaded_df" not in st.session_state:
+    st.session_state.uploaded_df = None
+if "uploaded_parse_info" not in st.session_state:
+    st.session_state.uploaded_parse_info = None
+
+df = None
+parse_info = None
+
+# 1. First, check if there is an uploaded or pre-loaded dataframe in session state
+if st.session_state.uploaded_df is not None:
+    df = st.session_state.uploaded_df
+    parse_info = st.session_state.uploaded_parse_info
+else:
+    # 2. Next, try loading from the configured Secret URL or the DEFAULT_SHEET_URL
+    active_url = get_secret("sheet_csv_url", "").strip() or DEFAULT_SHEET_URL
+    if active_url:
         try:
-            st.cache_data.clear()
-            df, parse_info = _load_enriched(override)
-            st.rerun()
-        except Exception as e2:
-            st.error(str(e2))
+            df, parse_info = _load_enriched(active_url)
+        except Exception as e:
+            # Let it fail gracefully and fall back to the welcome screen
+            pass
+
+# 3. If no data has been loaded, display the beautiful branded setup/upload screen!
+if df is None:
+    st.title("📊 Tenacious Growth Dashboard")
+    st.markdown("### Welcome! Let's connect your weekly check-in data.")
+    st.info(
+        "To get started, you can either **upload a CSV export** of your Google Sheet directly, "
+        "or **paste a shared Google Sheets link**."
+    )
+    
+    tab_upload, tab_link = st.tabs(["📁 Upload CSV File (Private & Local)", "🔗 Link Google Sheet"])
+    
+    with tab_upload:
+        st.markdown("#### 1. Download your Google Sheet as a CSV file:")
+        st.markdown(
+            "In your Google Sheet, click **File** ➔ **Download** ➔ **Comma-separated values (.csv)**"
+        )
+        uploaded_file = st.file_uploader("Upload check-ins.csv", type=["csv"], key="main_csv_uploader")
+        if uploaded_file is not None:
+            try:
+                import io
+                text = io.StringIO(uploaded_file.getvalue().decode("utf-8")).read()
+                from data_loader import _parse_csv_text, _coerce_types, _normalize_columns, validate_sheet_dataframe
+                raw_df, p_info = _parse_csv_text(text)
+                raw_df = _coerce_types(_normalize_columns(raw_df))
+                validate_sheet_dataframe(raw_df)
+                
+                # Enrich using existing logic
+                df_engine = growth_signal_engine.process_dataframe(raw_df)
+                df_engine["spec_growth_tier"] = df_engine["growth_tier"]
+                df_scored = scoring.enrich_dataframe(df_engine.drop(columns=["growth_tier"]))
+                df_scored["growth_tier"] = df_scored["spec_growth_tier"]
+                
+                st.session_state.uploaded_df = df_scored
+                st.session_state.uploaded_parse_info = p_info
+                st.success("✅ CSV uploaded and parsed successfully!")
+                st.rerun()
+            except Exception as ex:
+                st.error(f"Error parsing uploaded CSV: {ex}")
+                
+    with tab_link:
+        st.markdown("#### Paste your Google Sheet sharing link:")
+        st.info(
+            "💡 **Important:** Make sure the sheet's general access is set to **'Anyone with the link can view'** "
+            "so the dashboard can fetch the data automatically."
+        )
+        override = st.text_input("Google Sheets Link (shared or published CSV URL)", value=get_secret("sheet_csv_url", ""))
+        if override:
+            try:
+                st.cache_data.clear()
+                df_scored, p_info = _load_enriched(override)
+                st.session_state.uploaded_df = df_scored
+                st.session_state.uploaded_parse_info = p_info
+                st.success("✅ Linked to Google Sheet successfully!")
+                st.rerun()
+            except Exception as e2:
+                st.error(f"Could not load from Google Sheet link: {e2}")
+                
     st.stop()
 
 if parse_info and (parse_info.repaired_rows or parse_info.skipped_rows):
@@ -657,6 +728,13 @@ with st.sidebar:
     if st.button("↻ Refresh Data", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
+        
+    if st.session_state.uploaded_df is not None:
+        if st.button("📁 Reset / Load New Sheet", use_container_width=True):
+            st.session_state.uploaded_df = None
+            st.session_state.uploaded_parse_info = None
+            st.cache_data.clear()
+            st.rerun()
         
     st.caption(f"{len(people)} team members · {len(df)} check-ins")
 
@@ -1256,6 +1334,113 @@ elif view_mode == "Talent Profiles":
                     else:
                         st.caption("No QA data available.")
 
+        st.markdown("---")
+
+    # ── Gemini AI Talent Coach Section ────────────────────────────────────
+    if not weeks_df.empty:
+        st.markdown(
+            '<p style="font-size:1.25rem;font-weight:700;color:#585ba6;margin-bottom:4px;margin-top:1.5rem;">'
+            '🤖 AI Talent Coach Insights</p>'
+            '<p style="font-size:0.85rem;color:#7b7fa8;margin-top:0;">Generative AI-powered analysis of weekly performance logs</p>',
+            unsafe_allow_html=True
+        )
+        
+        # Check for GEMINI_API_KEY
+        gemini_key = get_secret("GEMINI_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
+        
+        # Allow manual override in session state
+        if "gemini_api_key_override" not in st.session_state:
+            st.session_state.gemini_api_key_override = ""
+            
+        active_key = st.session_state.gemini_api_key_override or gemini_key
+        
+        with st.expander("✨ Open AI Talent Coach Console", expanded=False):
+            if not active_key:
+                st.info("🔑 **Unlock AI Coaching Insights!** Get a free Gemini API key to start.")
+                st.markdown(
+                    "1. Go to [Google AI Studio](https://aistudio.google.com/) and click **Get API key**.\n"
+                    "2. Create a free API key in seconds.\n"
+                    "3. Paste your key below to unlock this feature on this session:"
+                )
+                input_key = st.text_input("Gemini API Key", type="password", key="key_input_field")
+                if input_key:
+                    st.session_state.gemini_api_key_override = input_key
+                    st.success("API Key updated for this session!")
+                    st.rerun()
+            else:
+                # We have a key!
+                st.markdown("##### 🧠 Performance Analysis & Actionable Advice")
+                
+                # Button to trigger AI generation
+                if f"ai_summary_{selected}" not in st.session_state:
+                    st.session_state[f"ai_summary_{selected}"] = None
+                    
+                generate_btn = st.button("🪄 Generate AI Assessment", type="primary", use_container_width=True)
+                
+                if generate_btn or st.session_state[f"ai_summary_{selected}"]:
+                    if generate_btn:
+                        # Show spinner
+                        with st.spinner("Analyzing talent logs with Gemini..."):
+                            try:
+                                # 1. Prepare data for the prompt
+                                recent_submissions = weeks_df.head(4) # Analyze last 4 submissions
+                                if recent_submissions.empty:
+                                    st.warning("No submission history to analyze.")
+                                else:
+                                    import google.generativeai as genai
+                                    genai.configure(api_key=active_key)
+                                    
+                                    # Format history for prompt
+                                    history_text = ""
+                                    for idx, (_, r) in enumerate(recent_submissions.iterrows()):
+                                        week_lbl = format_week_label(r)
+                                        ach = r.get("key_achievements", "N/A")
+                                        chall = r.get("challenges", "N/A")
+                                        comp = r.get("tickets_completed", "N/A")
+                                        exp = r.get("tickets_expected", "N/A")
+                                        qa = r.get("qa_first_pass_pct", "N/A")
+                                        rat = r.get("overall_rating", "N/A")
+                                        tier = r.get("growth_tier", "N/A")
+                                        
+                                        history_text += (
+                                            f"### Week Beginning: {week_lbl}\n"
+                                            f"- **Growth Tier**: {tier}\n"
+                                            f"- **Tickets Completed**: {comp} / {exp}\n"
+                                            f"- **QA First-Pass %**: {qa}%\n"
+                                            f"- **Self-Rating**: {rat} / 5\n"
+                                            f"- **Key Achievements**: {ach}\n"
+                                            f"- **Challenges**: {chall}\n\n"
+                                        )
+                                        
+                                    prompt = (
+                                        f"You are an expert HR Talent Specialist and Agile Performance Coach. "
+                                        f"You are analyzing the performance of a software talent named {talent_name} based on their last {len(recent_submissions)} weeks of self-reported check-ins.\n\n"
+                                        f"Here is their performance history:\n"
+                                        f"{history_text}\n"
+                                        f"Based on this data, provide a professional, constructive, and actionable assessment including:\n"
+                                        f"1. **Executive Performance Summary**: A brief, encouraging 3-4 sentence paragraph summarizing their recent progress, work rate, and highlights.\n"
+                                        f"2. **Risk & Trajectory Assessment**: Identify any warning signs (such as a drop in tickets, low QA first-pass, repetitive achievements, or signs of 'Silent Struggle' or plateauing). Be objective.\n"
+                                        f"3. **Tailored Manager Coaching Tips**: Give 3 highly practical, specific coaching points or questions for the manager to use in their next 1-on-1 with {talent_name} to help them grow and level up.\n\n"
+                                        f"Formatting Guidelines: Use clear markdown headers, bold bullet points, and maintain a supportive but professional corporate tone. Keep the advice tailored specifically to the metrics and text they wrote."
+                                    )
+                                    
+                                    # Call Gemini API
+                                    model = genai.GenerativeModel("gemini-1.5-flash")
+                                    response = model.generate_content(prompt)
+                                    st.session_state[f"ai_summary_{selected}"] = response.text
+                            except Exception as ex:
+                                st.error(f"Gemini API Error: {ex}")
+                                st.info("Tip: Double-check your API key and network connection.")
+                                
+                    # Display the cached or newly generated summary
+                    if st.session_state[f"ai_summary_{selected}"]:
+                        st.markdown(
+                            '<div style="background-color:#f8fafc; border-left: 4px solid #585ba6; '
+                            'padding: 1.5rem; border-radius: 8px; margin: 1rem 0; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">'
+                            f'{st.session_state[f"ai_summary_{selected}"]}'
+                            '</div>',
+                            unsafe_allow_html=True
+                        )
         st.markdown("---")
 
     # ── Chronological Progress Table ────────────────────────────────────────

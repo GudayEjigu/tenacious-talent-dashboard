@@ -319,17 +319,34 @@ def load_from_gspread(spreadsheet_id: str, worksheet_name: str | None = None) ->
     return _coerce_types(_normalize_columns(df))
 
 
+def clean_google_sheets_url(url: str) -> str:
+    """
+    Automatically converts a standard Google Sheet sharing/edit URL into a direct CSV export link.
+    Requires that the sheet is shared as "Anyone with the link can view".
+    """
+    import re
+    url = url.strip()
+    if "docs.google.com/spreadsheets" in url:
+        # If it's already a published CSV or export CSV, return as is
+        if "output=csv" in url or "format=csv" in url:
+            return url
+        # Extract spreadsheet ID and gid (worksheet index) if present
+        match = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", url)
+        if match:
+            spreadsheet_id = match.group(1)
+            gid_match = re.search(r"gid=(\d+)", url)
+            gid_str = f"&gid={gid_match.group(1)}" if gid_match else ""
+            return f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv{gid_str}"
+    return url
+
+
 def load_sheet(csv_url: str | None = None) -> tuple[pd.DataFrame, CsvParseInfo]:
-    """Load the Telegram weekly check-in Google Sheet (published CSV)."""
+    """Load the Telegram weekly check-in Google Sheet (published CSV or shared URL)."""
     url = (csv_url or "").strip() or get_secret("sheet_csv_url", "").strip()
     if not url:
         raise ValueError(
-            "Set `sheet_csv_url` in `.streamlit/secrets.toml` (no `#` at the start of the line). "
-            "The link must include `output=csv` from Publish to web → CSV."
+            "Please provide a Google Sheets URL. You can set `sheet_csv_url` in `.streamlit/secrets.toml` "
+            "or paste a link to a Google Sheet shared as 'Anyone with the link can view'."
         )
-    if "pubhtml" in url or "output=csv" not in url:
-        raise ValueError(
-            "URL must be a published **CSV** link (contains `output=csv`). "
-            "Republish via File → Share → Publish to web → Comma-separated values (.csv)."
-        )
+    url = clean_google_sheets_url(url)
     return load_from_csv_url(url)
