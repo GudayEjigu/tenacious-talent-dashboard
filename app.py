@@ -1804,13 +1804,13 @@ elif view_mode == "team_directory":
     <div style="display: flex; gap: 24px; margin-top: 16px; margin-bottom: 32px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border-radius: 20px; padding: 28px; box-shadow: 0 15px 35px rgba(79, 70, 229, 0.25); position: relative; overflow: hidden; color: white; transition: transform 0.2s ease-in-out;">
             <div style="position: absolute; top: -10px; right: -15px; font-size: 9rem; opacity: 0.15; line-height: 1; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">👨‍💻</div>
-            <div style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; font-family: 'Inter', sans-serif;">Total Active Talents</div>
-            <div style="font-size: 4rem; font-weight: 800; line-height: 1; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1);">{num_talents}</div>
+            <h4 style="text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; margin-top: 0; font-family: 'Inter', sans-serif; color: white !important;">Total Active Talents</h4>
+            <h1 style="font-weight: 800; line-height: 1; margin: 0; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1); color: white !important;">{num_talents}</h1>
         </div>
         <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); border-radius: 20px; padding: 28px; box-shadow: 0 15px 35px rgba(13, 148, 136, 0.25); position: relative; overflow: hidden; color: white; transition: transform 0.2s ease-in-out;">
             <div style="position: absolute; top: -10px; right: -15px; font-size: 9rem; opacity: 0.15; line-height: 1; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">🏢</div>
-            <div style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; font-family: 'Inter', sans-serif;">Total Active Clients</div>
-            <div style="font-size: 4rem; font-weight: 800; line-height: 1; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1);">{num_clients}</div>
+            <h4 style="text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; margin-top: 0; font-family: 'Inter', sans-serif; color: white !important;">Total Active Clients</h4>
+            <h1 style="font-weight: 800; line-height: 1; margin: 0; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1); color: white !important;">{num_clients}</h1>
         </div>
     </div>
     """
@@ -1908,8 +1908,8 @@ elif view_mode == "team_directory":
                 f'  text-align: center;'
                 f'" class="talent-box-link">'
                 f'  <div class="talent-box-icon" style="font-size: 4rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; line-height: 1;">👤</div>'
-                f'  <div style="font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 6px; word-break: break-word;">{escaped_name}</div>'
-                f'  <div style="font-weight: 600; font-size: 0.85rem; color: #585ba6; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">{escaped_client}</div>'
+                f'  <h3 style="margin-top: 0; margin-bottom: 6px; word-break: break-word;">{escaped_name}</h3>'
+                f'  <h4 style="color: #585ba6 !important; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 4px;">{escaped_client}</h4>'
                 f'  {escaped_emails_html}'
                 f'  {milestone_html}'
                 f'</a>'
