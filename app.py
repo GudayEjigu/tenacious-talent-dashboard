@@ -1783,7 +1783,7 @@ elif view_mode == "team_directory":
     num_talents = len(people)
     num_clients = len(set(talent_to_client.values()))
     
-    st.markdown("Here you can find an overview of all active software talents and their current client placements.")
+    st.markdown("A quick look at our Talents and our Clients")
     
     overview_html = f"""
     <div style="display: flex; gap: 24px; margin-top: 16px; margin-bottom: 32px; flex-wrap: wrap;">
