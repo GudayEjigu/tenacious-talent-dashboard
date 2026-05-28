@@ -1849,11 +1849,8 @@ elif view_mode == "talent_profiles":
             
             st.subheader(f"Week of {week_label}{warn_badge}")
             
-            for c in checks:
-                _render_check(c)
-                
-            st.markdown("---")
-            st.markdown("### 📝 What they wrote")
+            t_name = name_by_email.get(st.session_state.selected_talent, "Talent")
+            st.markdown(f"### 📝 What {t_name} wrote")
             
             # Text responses in a fixed 3-column grid
             col_ach, col_cha, col_hi = st.columns(3)
@@ -1890,6 +1887,11 @@ elif view_mode == "talent_profiles":
                 rating = row.get("overall_rating")
                 rating_val = f"{int(rating)} / 5" if pd.notna(rating) else "N/A"
                 st.metric("Self-Rating", rating_val)
+
+            st.markdown("---")
+            st.markdown("### 🤖 Automated Insights")
+            for c in checks:
+                _render_check(c)
 
         if st.button("View Detailed Weekly Submissions 📅", type="primary", use_container_width=True):
             show_submissions_modal(weeks_df)
