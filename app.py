@@ -1547,15 +1547,15 @@ elif view_mode == "talent_profiles":
                 "Week Beginning": week_begin_lbl,
                 "Timestamp": ts_val,
                 "Email address": row.get("email", ""),
-                "What were your key achievements of the week?": row.get("key_achievements", ""),
-                "Number of tickets actually completed QA or Done?": completed_val,
-                "Expected number of tickets to get completed": expected_val,
-                "% of tickets that passed QA on first attempt": qa_val,
-                "What were your challenges of the week?": row.get("challenges", ""),
-                "Have you met all the expectations of your employer for this week?": row.get("met_expectations", ""),
-                "Overall rating of your performance this week?": rating_val,
-                "Write here any other things you want to highlight (optional)": row.get("other_highlights", ""),
-                "Upload any image or document you want us to see (optional)": row.get("upload", "")
+                "Key Achievements": row.get("key_achievements", ""),
+                "Tickets Completed": completed_val,
+                "Tickets Expected": expected_val,
+                "QA First Pass %": qa_val,
+                "Challenges": row.get("challenges", ""),
+                "Met Expectations": row.get("met_expectations", ""),
+                "Overall Rating": rating_val,
+                "Other Highlights": row.get("other_highlights", ""),
+                "Uploads": row.get("upload", "")
             })
         else:
             # Missing submission for this week!
@@ -1563,15 +1563,15 @@ elif view_mode == "talent_profiles":
                 "Week Beginning": week_begin_lbl,
                 "Timestamp": "",
                 "Email address": selected,
-                "What were your key achievements of the week?": "",
-                "Number of tickets actually completed QA or Done?": "",
-                "Expected number of tickets to get completed": "",
-                "% of tickets that passed QA on first attempt": "",
-                "What were your challenges of the week?": "",
-                "Have you met all the expectations of your employer for this week?": "",
-                "Overall rating of your performance this week?": "",
-                "Write here any other things you want to highlight (optional)": "",
-                "Upload any image or document you want us to see (optional)": ""
+                "Key Achievements": "",
+                "Tickets Completed": "",
+                "Tickets Expected": "",
+                "QA First Pass %": "",
+                "Challenges": "",
+                "Met Expectations": "",
+                "Overall Rating": "",
+                "Other Highlights": "",
+                "Uploads": ""
             })
             
     progress_table_df = pd.DataFrame(progress_rows)
@@ -1579,11 +1579,8 @@ elif view_mode == "talent_profiles":
     # Columns that should stay compact (no wrap)
     NOWRAP_COLS = {
         "Week Beginning", "Timestamp", "Email address",
-        "Number of tickets actually completed QA or Done?",
-        "Expected number of tickets to get completed",
-        "% of tickets that passed QA on first attempt",
-        "Overall rating of your performance this week?",
-        "Have you met all the expectations of your employer for this week?",
+        "Tickets Completed", "Tickets Expected", "QA First Pass %",
+        "Overall Rating", "Met Expectations"
     }
     def _df_to_html_table(df):
         header_cells = "".join(
@@ -1755,11 +1752,11 @@ elif view_mode == "talent_profiles":
             # Pagination controls
             col1, col2, col3 = st.columns([1, 2, 1])
             with col1:
-                st.button("Older", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
+                st.button("Older weeks", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
             with col2:
                 st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week of {week_label}</div>", unsafe_allow_html=True)
             with col3:
-                st.button("Newer", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
+                st.button("Newer weeks", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
             
             st.markdown("---")
             
