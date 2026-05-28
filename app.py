@@ -637,6 +637,23 @@ def _load_enriched(csv_url: str | None = None):
     df_scored["growth_tier"] = df_scored["spec_growth_tier"]
     
     return df_scored, parse_info
+def format_tenure(months_str: str) -> str:
+    if not months_str or str(months_str).lower() == "nan":
+        return "--"
+    try:
+        m = float(months_str)
+        if m < 0:
+            return "--"
+        total_months = int(m)
+        if total_months < 12:
+            return f"{total_months} months"
+        years = total_months // 12
+        rem_months = total_months % 12
+        y_str = f"{years} year{'s' if years > 1 else ''}"
+        m_str = f" {rem_months} month{'s' if rem_months > 1 else ''}" if rem_months > 0 else ""
+        return y_str + m_str
+    except ValueError:
+        return str(months_str)
 
 
 def generate_hr_explanation(row) -> tuple[str, str, str, str]:
@@ -1461,7 +1478,7 @@ elif view_mode == "talent_profiles":
             st.markdown("<br/>", unsafe_allow_html=True)
             m1, m2, m3 = st.columns(3)
             m1.metric("Date of Joining", doj)
-            m2.metric("Tenure", months_past if months_past and months_past.lower() != "nan" else "--")
+            m2.metric("Tenure", format_tenure(months_past))
             m3.metric(next_milestone_label, next_milestone_val if next_milestone_val.lower() != "nan" else "--")
             st.markdown("---")
             
@@ -1764,14 +1781,14 @@ elif view_mode == "talent_profiles":
 
         if st.button("View Detailed Weekly Submissions", type="primary", use_container_width=True):
             show_submissions_modal(weeks_df)
+
+        st.markdown("---")
+        # ── Chronological Progress Table ────────────────────────────────────────
+        st.subheader("Chronological Progress History")
+        st.caption("A consolidated timeline of metrics and weekly check-in entries across all weeks.")
+        st.markdown(_df_to_html_table(progress_table_df), unsafe_allow_html=True)
     else:
         st.info("No detailed check-in submissions have been submitted by this talent yet.")
-
-    st.markdown("---")
-    # ── Chronological Progress Table ────────────────────────────────────────
-    st.subheader("Chronological Progress History")
-    st.caption("A consolidated timeline of metrics and weekly check-in entries across all weeks.")
-    st.markdown(_df_to_html_table(progress_table_df), unsafe_allow_html=True)
 
 # --- VIEW: TEAM DIRECTORY (GDOC) ---
 elif view_mode == "team_directory":
@@ -1846,7 +1863,7 @@ elif view_mode == "team_directory":
                             milestone_html = (
                                 f'<div style="margin-top: 12px; font-size: 0.8rem; color: #475569; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.1); width: 100%;">'
                                 f'  <strong>Joined:</strong> {html.escape(doj)}<br/>'
-                                f'  <strong>Tenure:</strong> {html.escape(months_past)}'
+                                f'  <strong>Tenure:</strong> {html.escape(format_tenure(months_past))}'
                                 f'</div>'
                             )
                         break
