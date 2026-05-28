@@ -241,6 +241,14 @@ st.markdown(
         color: #475569 !important;
     }
 
+    .three-col-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        width: 100%;
+        margin-bottom: 2.25rem;
+    }
+
     @media (max-width: 768px) {
         h1, h1 *, div[data-testid="stMarkdownContainer"] h1, div[data-testid="stHeadingWithActionElements"] h1, div[data-testid="stMarkdownContainer"] h1 * {
             font-size: 2rem !important;
@@ -253,6 +261,9 @@ st.markdown(
         }
         h4, h4 *, [data-testid="stHeader"] h4 {
             font-size: 1.125rem !important;
+        }
+        .three-col-grid {
+            grid-template-columns: 1fr;
         }
     }
     p, span, li, td, th, div, a {
@@ -1865,7 +1876,7 @@ elif view_mode == "team_directory":
         card_bg = "#ffffff"
         
         # Start a new grid for this client (no text header as requested)
-        html_lines.append('<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; width: 100%; margin-bottom: 2.25rem;">')
+        html_lines.append('<div class="three-col-grid">')
         
         for email in emails:
             name = name_by_email[email]
