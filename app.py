@@ -1393,34 +1393,35 @@ if view_mode == "weekly_status":
 
 # --- VIEW: TALENT PROFILES ---
 elif view_mode == "talent_profiles":
-    # Sidebar Profile selection grouped by Client
-    with st.sidebar:
-        st.subheader("Select Talent Profile")
+    st.markdown("### Select Talent Profile")
+    
+    # Build client-talent mappings dynamically
+    talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
+    client_to_talents = {}
+    for e in people:
+        c = talent_to_client[e]
+        client_to_talents.setdefault(c, []).append(e)
         
-        # Build client-talent mappings dynamically
-        talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
-        client_to_talents = {}
-        for e in people:
-            c = talent_to_client[e]
-            client_to_talents.setdefault(c, []).append(e)
-            
-        clients = sorted(list(client_to_talents.keys()))
+    clients = sorted(list(client_to_talents.keys()))
+    
+    # Determine currently selected talent
+    curr_talent = st.session_state.selected_talent
+    if curr_talent not in people:
+        curr_talent = people[0]
+        st.session_state.selected_talent = curr_talent
         
-        # Determine currently selected talent
-        curr_talent = st.session_state.selected_talent
-        if curr_talent not in people:
-            curr_talent = people[0]
-            st.session_state.selected_talent = curr_talent
-            
-        curr_client = talent_to_client[curr_talent]
-        
-        # Track selected client in session state
-        if "selected_client" not in st.session_state or st.session_state.selected_client not in clients:
-            st.session_state.selected_client = curr_client
+    curr_client = talent_to_client[curr_talent]
+    
+    # Track selected client in session state
+    if "selected_client" not in st.session_state or st.session_state.selected_client not in clients:
+        st.session_state.selected_client = curr_client
 
-        # Select Client / Project using modern pills
+    # Render selection pills side-by-side at the top of the profile
+    col_client, col_talent = st.columns(2)
+    
+    with col_client:
         selected_client = st.pills(
-            "Client / Project",
+            "Filter by Client / Project",
             clients,
             selection_mode="single",
             default=st.session_state.selected_client,
@@ -1431,6 +1432,7 @@ elif view_mode == "talent_profiles":
         else:
             st.session_state.selected_client = selected_client
             
+    with col_talent:
         # Filter talents for the selected client
         client_talents = client_to_talents[selected_client]
         
@@ -1438,7 +1440,6 @@ elif view_mode == "talent_profiles":
         if st.session_state.selected_talent not in client_talents:
             st.session_state.selected_talent = client_talents[0]
             
-        # Select Talent using modern pills
         selected_talent = st.pills(
             "Select Talent",
             client_talents,
@@ -1452,7 +1453,9 @@ elif view_mode == "talent_profiles":
         else:
             st.session_state.selected_talent = selected_talent
             
-        selected = st.session_state.selected_talent
+    selected = st.session_state.selected_talent
+    
+    st.markdown("---")
         
     weeks_df = person_weeks(df, selected)
     talent_name = name_by_email[selected]
@@ -1933,7 +1936,7 @@ elif view_mode == "team_directory":
         card_bg = client_colors[client_name]
         
         box_html = (
-            f'<a href="/?selected_talent={email}" target="_top" style="'
+            f'<a href="/?selected_talent={email}" target="_self" style="'
             f'  display: flex;'
             f'  flex-direction: column;'
             f'  align-items: center;'
