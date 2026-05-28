@@ -1785,9 +1785,21 @@ elif view_mode == "team_directory":
     
     st.markdown("Here you can find an overview of all active software talents and their current client placements.")
     
-    col1, col2 = st.columns(2)
-    col1.metric("Total Active Talents", num_talents)
-    col2.metric("Total Active Clients", num_clients)
+    overview_html = f"""
+    <div style="display: flex; gap: 24px; margin-top: 16px; margin-bottom: 32px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border-radius: 20px; padding: 28px; box-shadow: 0 15px 35px rgba(79, 70, 229, 0.25); position: relative; overflow: hidden; color: white; transition: transform 0.2s ease-in-out;">
+            <div style="position: absolute; top: -10px; right: -15px; font-size: 9rem; opacity: 0.15; line-height: 1; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">👨‍💻</div>
+            <div style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; font-family: 'Inter', sans-serif;">Total Active Talents</div>
+            <div style="font-size: 4rem; font-weight: 800; line-height: 1; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1);">{num_talents}</div>
+        </div>
+        <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); border-radius: 20px; padding: 28px; box-shadow: 0 15px 35px rgba(13, 148, 136, 0.25); position: relative; overflow: hidden; color: white; transition: transform 0.2s ease-in-out;">
+            <div style="position: absolute; top: -10px; right: -15px; font-size: 9rem; opacity: 0.15; line-height: 1; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">🏢</div>
+            <div style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; font-family: 'Inter', sans-serif;">Total Active Clients</div>
+            <div style="font-size: 4rem; font-weight: 800; line-height: 1; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1);">{num_clients}</div>
+        </div>
+    </div>
+    """
+    st.markdown(overview_html, unsafe_allow_html=True)
     st.markdown("---")
     
     st.markdown(
