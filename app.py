@@ -241,9 +241,9 @@ st.markdown(
         color: #475569 !important;
     }
 
-    .three-col-grid {
+    .two-col-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 24px;
         width: 100%;
         margin-bottom: 2.25rem;
@@ -262,7 +262,7 @@ st.markdown(
         h4, h4 *, [data-testid="stHeader"] h4 {
             font-size: 1.125rem !important;
         }
-        .three-col-grid {
+        .two-col-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -1882,7 +1882,7 @@ elif view_mode == "team_directory":
         card_bg = "#ffffff"
         
         # Start a new grid for this client (no text header as requested)
-        html_lines.append('<div class="three-col-grid">')
+        html_lines.append('<div class="two-col-grid">')
         
         for email in emails:
             name = name_by_email[email]
