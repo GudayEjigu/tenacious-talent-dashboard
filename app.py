@@ -1779,7 +1779,16 @@ elif view_mode == "talent_profiles":
 # --- VIEW: TEAM DIRECTORY (GDOC) ---
 elif view_mode == "team_directory":
     st.title("Talent Directory")
-    st.caption("A dynamic, automatically updating index of all active software talents and their current client placements.")
+    talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
+    num_talents = len(people)
+    num_clients = len(set(talent_to_client.values()))
+    
+    st.markdown("Here you can find an overview of all active software talents and their current client placements.")
+    
+    col1, col2 = st.columns(2)
+    col1.metric("Total Active Talents", num_talents)
+    col2.metric("Total Active Clients", num_clients)
+    st.markdown("---")
     
     st.markdown(
         """
@@ -1808,7 +1817,6 @@ elif view_mode == "team_directory":
         unsafe_allow_html=True
     )
     
-    talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
     # Group and sort talents by client
     sorted_talents = sorted(people, key=lambda e: (talent_to_client[e].lower(), name_by_email[e].lower()))
     
