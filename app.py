@@ -621,7 +621,7 @@ def _render_check(c: Check) -> None:
 
 
 @st.cache_data(ttl=600, show_spinner=False)
-def load_milestones_data() -> pd.DataFrame:
+def load_milestones_data_v2() -> pd.DataFrame:
     url = "https://docs.google.com/spreadsheets/d/1kFT1zlQwPfQ8cdz_Vop51ZCPjOgiXYrOv8xbn0J8dRc/export?format=csv&gid=1924842637"
     try:
         df = pd.read_csv(url)
@@ -1477,7 +1477,7 @@ elif view_mode == "talent_profiles":
     
     # ── Render Talent Milestones ──
     t_lower = talent_name.lower().strip()
-    m_df = load_milestones_data()
+    m_df = load_milestones_data_v2()
     matched_row = None
     if not m_df.empty and "Name" in m_df.columns:
         for _, row_m in m_df.iterrows():
