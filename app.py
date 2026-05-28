@@ -1907,7 +1907,6 @@ elif view_mode == "team_directory":
                 f'  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);'
                 f'  text-align: center;'
                 f'" class="talent-box-link">'
-                f'  <div class="talent-box-icon" style="font-size: 4rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; line-height: 1;">👤</div>'
                 f'  <h3 style="margin-top: 0; margin-bottom: 6px; word-break: break-word;">{escaped_name}</h3>'
                 f'  <h4 style="color: #585ba6 !important; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 4px;">{escaped_client}</h4>'
                 f'  {escaped_emails_html}'
