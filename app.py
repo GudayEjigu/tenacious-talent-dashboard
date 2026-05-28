@@ -197,7 +197,7 @@ except Exception:
 st.set_page_config(
     page_title="Talent management weekly overview",
     page_icon="icon.png",
-    layout="wide",
+    layout="centered",
     initial_sidebar_state="collapsed",
 )
 
@@ -212,7 +212,7 @@ st.markdown(
     }
 
     h1, h1 *, div[data-testid="stMarkdownContainer"] h1, div[data-testid="stHeadingWithActionElements"] h1, div[data-testid="stMarkdownContainer"] h1 * {
-        font-size: 3.5rem !important;
+        font-size: 3.2rem !important;
         font-weight: 800 !important;
         color: #1e293b !important;
         margin-bottom: 0.2rem !important;
@@ -220,7 +220,7 @@ st.markdown(
         line-height: 1.2 !important;
     }
     h2, h2 *, div[data-testid="stMarkdownContainer"] h2, div[data-testid="stHeadingWithActionElements"] h2, div[data-testid="stMarkdownContainer"] h2 * {
-        font-size: 2.5rem !important;
+        font-size: 2.2rem !important;
         font-weight: 700 !important;
         color: #1e293b !important;
         margin-top: 1.2rem !important;
@@ -229,30 +229,30 @@ st.markdown(
         line-height: 1.3 !important;
     }
     h3, h3 *, div[data-testid="stMarkdownContainer"] h3, div[data-testid="stHeadingWithActionElements"] h3, div[data-testid="stMarkdownContainer"] h3 * {
-        font-size: 1.8rem !important;
+        font-size: 1.6rem !important;
         font-weight: 600 !important;
         color: #334155 !important;
         margin-top: 0.6rem !important;
         margin-bottom: 0.3rem !important;
     }
     h4, [data-testid="stHeader"] h4 {
-        font-size: 1.15rem !important;
+        font-size: 1.05rem !important;
         font-weight: 600 !important;
         color: #475569 !important;
     }
     p, span, li, td, th, div, a {
-        font-size: 0.78rem !important;
+        font-size: 0.74rem !important;
     }
     .stMarkdown caption, [data-testid="stMarkdownContainer"] caption, label {
-        font-size: 0.75rem !important;
+        font-size: 0.72rem !important;
     }
 
     .main, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"] {
-        background-color: #f8fafc !important;
+        background-color: #ffffff !important;
     }
 
     [data-testid="stHeader"] {
-        background-color: rgba(248, 250, 252, 0.95) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
         backdrop-filter: blur(8px) !important;
     }
 
