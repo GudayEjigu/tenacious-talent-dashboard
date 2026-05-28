@@ -1852,30 +1852,44 @@ elif view_mode == "talent_profiles":
             for c in checks:
                 _render_check(c)
                 
-            st.markdown("**What they wrote**")
-            for col_key, label in [
-                ("key_achievements", "Key achievements"),
-                ("challenges", "Challenges"),
-                ("other_highlights", "Other highlights"),
-            ]:
-                val = str(row.get(col_key, "") or "").strip()
-                if val and val.lower() != "nan":
-                    st.markdown(f"*{label}*")
-                    st.write(val)
-                    
-            nums = []
-            if pd.notna(row.get("tickets_completed")):
-                nums.append(f"Tickets done: **{int(row['tickets_completed'])}**")
-            if pd.notna(row.get("tickets_expected")):
-                nums.append(f"Expected: **{int(row['tickets_expected'])}**")
-            if pd.notna(row.get("qa_first_pass_pct")):
-                nums.append(f"QA first-pass: **{row['qa_first_pass_pct']:.0f}%**")
-            if pd.notna(row.get("overall_rating")):
-                nums.append(f"Self-rating: **{int(row['overall_rating'])}/5**")
-            if pd.notna(row.get("met_expectations")) and str(row["met_expectations"]).strip():
-                nums.append(f"Met expectations: **{row['met_expectations']}**")
-            if nums:
-                st.markdown(" · ".join(nums))
+            st.markdown("---")
+            st.markdown("### 📝 What they wrote")
+            
+            # Text responses in a fixed 3-column grid
+            col_ach, col_cha, col_hi = st.columns(3)
+            with col_ach:
+                st.markdown('<div class="detail-section-title">Key Achievements</div>', unsafe_allow_html=True)
+                ach = str(row.get("key_achievements", "") or "").strip()
+                st.markdown(f'<div class="answer-box">{ach if (ach and ach.lower() != "nan") else "*(No achievements shared)*"}</div>', unsafe_allow_html=True)
+            with col_cha:
+                st.markdown('<div class="detail-section-title">Challenges Faced</div>', unsafe_allow_html=True)
+                cha = str(row.get("challenges", "") or "").strip()
+                st.markdown(f'<div class="answer-box">{cha if (cha and cha.lower() != "nan") else "*(No challenges shared)*"}</div>', unsafe_allow_html=True)
+            with col_hi:
+                st.markdown('<div class="detail-section-title">Other Highlights</div>', unsafe_allow_html=True)
+                hi = str(row.get("other_highlights", "") or "").strip()
+                st.markdown(f'<div class="answer-box">{hi if (hi and hi.lower() != "nan") else "*(No highlights shared)*"}</div>', unsafe_allow_html=True)
+                
+            st.markdown("<br/>", unsafe_allow_html=True)
+            
+            # Numeric Stats in a fixed 4-column grid
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                met = row.get("met_expectations")
+                st.metric("Met Employer Expectations", str(met) if pd.notna(met) and str(met).strip() else "N/A")
+            with col2:
+                completed = row.get("tickets_completed")
+                expected = row.get("tickets_expected")
+                tickets_val = f"{int(completed)} / {int(expected)}" if pd.notna(completed) and pd.notna(expected) else "N/A"
+                st.metric("Tickets Completed", tickets_val)
+            with col3:
+                qa = row.get("qa_first_pass_pct")
+                qa_val = f"{qa:.0f}%" if pd.notna(qa) else "N/A"
+                st.metric("First-Pass QA", qa_val)
+            with col4:
+                rating = row.get("overall_rating")
+                rating_val = f"{int(rating)} / 5" if pd.notna(rating) else "N/A"
+                st.metric("Self-Rating", rating_val)
 
         if st.button("View Detailed Weekly Submissions 📅", type="primary", use_container_width=True):
             show_submissions_modal(weeks_df)
