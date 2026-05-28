@@ -617,8 +617,20 @@ def _render_check(c: Check) -> None:
         f'<span style="color: {bullet_color}; font-size: 1.15rem; margin-right: 8px; line-height: 1; vertical-align: middle;">●</span>'
         f'<span style="line-height: 1.4;"><b>{c.label}</b>{": " + c.detail if c.detail else ""}</span>'
         f'</div>',
-        unsafe_allow_html=True,
     )
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_milestones_data() -> pd.DataFrame:
+    url = "https://docs.google.com/spreadsheets/d/1kFT1zlQwPfQ8cdz_Vop51ZCPjOgiXYrOv8xbn0J8dRc/export?format=csv&gid=1924842637"
+    try:
+        df = pd.read_csv(url)
+        # Normalize column names by stripping trailing whitespace
+        df.columns = [str(c).strip() for c in df.columns]
+        return df
+    except Exception as e:
+        print(f"Error fetching milestones: {e}")
+        return pd.DataFrame()
 
 
 @st.cache_data(ttl=300, show_spinner="Loading and enriching sheet data…")
@@ -1463,6 +1475,49 @@ elif view_mode == "talent_profiles":
     st.title(f"👤 {talent_name}")
     st.caption(f"{len(weeks_df)} weekly check-in logs submitted")
     
+    # ── Render Talent Milestones ──
+    t_lower = talent_name.lower().strip()
+    m_df = load_milestones_data()
+    matched_row = None
+    if not m_df.empty and "Name" in m_df.columns:
+        for _, row_m in m_df.iterrows():
+            name_val = str(row_m.get("Name", "")).lower().strip()
+            if not name_val or name_val == "nan":
+                continue
+            # Match strictly by first and last name inclusion
+            if t_lower in name_val or name_val in t_lower:
+                matched_row = row_m
+                break
+
+    if matched_row is not None:
+        doj = str(matched_row.get("Date of joining", ""))
+        months_past = str(matched_row.get("Months past", ""))
+        
+        next_milestone_label = "Next Milestone"
+        next_milestone_val = "--"
+        
+        try:
+            mp_float = float(months_past.replace("months", "").strip())
+            if mp_float < 6:
+                next_milestone_label = "6 Months Mark"
+                next_milestone_val = str(matched_row.get("6 months mark", "--"))
+            elif mp_float < 12:
+                next_milestone_label = "12 Months Mark"
+                next_milestone_val = str(matched_row.get("12 months mark", "--"))
+            else:
+                next_milestone_label = "18 Months Mark"
+                next_milestone_val = str(matched_row.get("18 months mark", "--"))
+        except Exception:
+            pass
+            
+        if doj and doj.lower() != "nan":
+            st.markdown("<br/>", unsafe_allow_html=True)
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Date of Joining", doj)
+            m2.metric("Tenure", months_past if months_past and months_past.lower() != "nan" else "--")
+            m3.metric(next_milestone_label, next_milestone_val if next_milestone_val.lower() != "nan" else "--")
+            st.markdown("---")
+            
     progress_rows = []
     # Find this talent's first-ever submission week to avoid blank leading rows
     first_talent_week = weeks_df["week"].dropna().min() if not weeks_df.empty else None
