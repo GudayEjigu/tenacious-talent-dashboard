@@ -1828,12 +1828,12 @@ elif view_mode == "talent_profiles":
             # Pagination controls
             col1, col2, col3 = st.columns([1, 2, 1])
             with col1:
-                st.button("⬅️ Older", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
+                st.button("Older", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
             with col2:
                 display_page = total_pages - curr_page
                 st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {display_page} of {total_pages}</div>", unsafe_allow_html=True)
             with col3:
-                st.button("Newer ➡️", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
+                st.button("Newer", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
             
             st.markdown("---")
             
@@ -1842,15 +1842,13 @@ elif view_mode == "talent_profiles":
             prior = w_df.iloc[curr_page + 1] if curr_page + 1 < len(w_df) else None
             
             checks = week_checks(row, prior)
-            warn_count = sum(1 for c in checks if c.status == "warn")
             
             week_label = format_week_label(row)
-            warn_badge = f"  ⚠️ {warn_count} item(s) need attention" if warn_count else ""
             
-            st.subheader(f"Week of {week_label}{warn_badge}")
+            st.subheader(f"Week of {week_label}")
             
             t_name = name_by_email.get(st.session_state.selected_talent, "Talent")
-            st.markdown(f"### 📝 What {t_name} wrote")
+            st.markdown(f"### What {t_name} wrote")
             
             # Text responses in a fixed 3-column grid
             col_ach, col_cha, col_hi = st.columns(3)
@@ -1888,12 +1886,10 @@ elif view_mode == "talent_profiles":
                 rating_val = f"{int(rating)} / 5" if pd.notna(rating) else "N/A"
                 st.metric("Self-Rating", rating_val)
 
-            st.markdown("---")
-            st.markdown("### 🤖 Automated Insights")
             for c in checks:
                 _render_check(c)
 
-        if st.button("View Detailed Weekly Submissions 📅", type="primary", use_container_width=True):
+        if st.button("View Detailed Weekly Submissions", type="primary", use_container_width=True):
             show_submissions_modal(weeks_df)
     else:
         st.info("No detailed check-in submissions have been submitted by this talent yet.")
