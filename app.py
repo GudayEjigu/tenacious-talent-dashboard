@@ -1830,7 +1830,8 @@ elif view_mode == "talent_profiles":
             with col1:
                 st.button("⬅️ Older", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
             with col2:
-                st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {curr_page + 1} of {total_pages}</div>", unsafe_allow_html=True)
+                display_page = total_pages - curr_page
+                st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {display_page} of {total_pages}</div>", unsafe_allow_html=True)
             with col3:
                 st.button("Newer ➡️", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
             
