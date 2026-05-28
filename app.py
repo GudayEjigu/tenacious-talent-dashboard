@@ -1818,7 +1818,7 @@ elif view_mode == "talent_profiles":
 
 # --- VIEW: TEAM DIRECTORY (GDOC) ---
 elif view_mode == "team_directory":
-    st.title("Team Directory")
+    st.title("Talent Directory")
     st.caption("A dynamic, automatically updating index of all active software talents and their current client placements.")
     
     st.markdown(
@@ -1852,11 +1852,6 @@ elif view_mode == "team_directory":
     # Group and sort talents by client
     sorted_talents = sorted(people, key=lambda e: (talent_to_client[e].lower(), name_by_email[e].lower()))
     
-    # Assign a unique, very light background color per client
-    unique_clients = sorted(list(set(talent_to_client.values())))
-    bg_colors = ["#f8fafc", "#f0fdf4", "#fefce8", "#fff1f2", "#f5f3ff", "#f0f9ff", "#fdf4ff", "#ecfdf5"]
-    client_colors = {client: bg_colors[i % len(bg_colors)] for i, client in enumerate(unique_clients)}
-    
     import html
     html_lines = []
     
@@ -1872,10 +1867,9 @@ elif view_mode == "team_directory":
 
     for client_name, emails in client_groups.items():
         escaped_client = html.escape(client_name)
-        card_bg = client_colors[client_name]
+        card_bg = "#ffffff"
         
-        # Start a new grid for this client
-        html_lines.append(f'<div style="margin-top: 1.5rem; margin-bottom: 12px; font-weight: 700; font-size: 1.25rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">{escaped_client} Team</div>')
+        # Start a new grid for this client (no text header as requested)
         html_lines.append('<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; width: 100%; margin-bottom: 2.25rem;">')
         
         for email in emails:
