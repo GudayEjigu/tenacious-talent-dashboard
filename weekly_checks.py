@@ -30,65 +30,7 @@ class Check:
     detail: str = ""
 
 
-TALENT_ROSTER = {
-    # Ozone
-    "nabil@gettenacious.com": {"name": "Nabil Seid", "client": "Ozone"},
-    "yosef@gettenacious.com": {"name": "Yosef Engdawork", "client": "Ozone"},
-    "dibora@gettenacious.com": {"name": "Dibora Haile", "client": "Ozone"},
-    "jabez@gettenacious.com": {"name": "Jabez Kassa", "client": "Ozone"},
-    "rahel@gettenacious.com": {"name": "Rahel Weldegebriel", "client": "Ozone"},
-    "milky@gettenacious.com": {"name": "Milky Bekele", "client": "Ozone"},
-    "mahlet@gettenacious.com": {"name": "Mahlet Taye", "client": "Ozone"},
-    "rediet@gettenacious.com": {"name": "Rediet Girma", "client": "Ozone"},
-    "yohanes@gettenacious.com": {"name": "Yohanes Teshome", "client": "Ozone"},
-    "daniel@gettenacious.com": {"name": "Daniel Zelalem", "client": "Ozone"},
-    
-    # Computrition
-    "nahom@gettenacious.com": {"name": "Nahom Habtamu", "client": "Computrition"},
-    "nahom.fix@gmail.com": {"name": "Nahom Habtamu", "client": "Computrition"},
-    "zelalem@gettenacious.com": {"name": "Zelalem Getahun", "client": "Computrition"},
-    "belay@gettenacious.com": {"name": "Belay Birhanu", "client": "Computrition"},
-    "belay@10academy.org": {"name": "Belay Birhanu", "client": "Computrition"},
-    "birhanu@gettenacious.com": {"name": "Birhanu Gudisa", "client": "Computrition"},
-    "nahomb@gettenacious.com": {"name": "Nahom Bekele", "client": "Computrition"},
-    "mama@gettenacious.com": {"name": "Mama Mohammed", "client": "Computrition"},
-    "mamamohammed31@gmail.com": {"name": "Mama Mohammed", "client": "Computrition"},
-    
-    # RewardOps
-    "samuel@gettenacious.com": {"name": "Samuel Negash", "client": "RewardOps"},
-    "smlnegash@gmail.com": {"name": "Samuel Negash", "client": "RewardOps"},
-    "nardos@gettenacious.com": {"name": "Nardos Tilahun", "client": "RewardOps"},
-    "lillian@gettenacious.com": {"name": "Lillian Alehegn", "client": "RewardOps"},
-    "lillianalehegn123@gmail.com": {"name": "Lillian Alehegn", "client": "RewardOps"},
-    
-    # Vanson Technology Services
-    "alazar@gettenacious.com": {"name": "Alazar Getachew", "client": "Vanson Technology Services"},
-    "alazar.getachew@coraloyalty.com": {"name": "Alazar Getachew", "client": "Vanson Technology Services"},
-    "miliyon@gettenacious.com": {"name": "Miliyon Ayalew", "client": "Vanson Technology Services"},
-    
-    # Hypericum
-    "meron@gettenacious.com": {"name": "Meron Abdo", "client": "Hypericum"},
-    "meronabdo954@gmail.com": {"name": "Meron Abdo", "client": "Hypericum"},
-    
-    # MIR Digital
-    "fikerte@gettenacious.com": {"name": "Fikerte Alemayehu", "client": "MIR Digital"},
-    
-    # Shega
-    "tesfaye@gettenacious.com": {"name": "Tesfaye Alemayehu", "client": "Shega"},
-    
-    # Navigate
-    "yohans@gettenacious.com": {"name": "Yohans Samuel", "client": "Navigate"},
-    
-    # SCG
-    "akubazgi@gettenacious.com": {"name": "Akubazgi Gebremariam", "client": "SCG"},
-    
-    # Carlson
-    "filimon@gettenacious.com": {"name": "Filimon Haylemariam", "client": "Carlson"},
-    
-    # Tech
-    "sumeya@gettenacious.com": {"name": "Sumeya Sirmula", "client": "Tech"},
-    "tadesse@gettenacious.com": {"name": "Tadesse Abateneh Walelign", "client": "Tech"},
-}
+TALENT_ROSTER = {}
 
 
 def display_name(email: str) -> str:

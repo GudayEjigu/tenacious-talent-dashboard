@@ -115,6 +115,19 @@ def load_roster_from_gdoc() -> tuple[dict, list]:
         "estifanos@gettenacious.com": {"name": "Estifanos Teklay", "client": "Modo"},
     }
     
+@st.cache_data(ttl=600, show_spinner=False)
+def load_milestones_data_v2() -> pd.DataFrame:
+    url = "https://docs.google.com/spreadsheets/d/1kFT1zlQwPfQ8cdz_Vop51ZCPjOgiXYrOv8xbn0J8dRc/export?format=csv&gid=1924842637"
+    try:
+        df = pd.read_csv(url)
+        # Normalize column names by stripping trailing whitespace
+        df.columns = [str(c).strip() for c in df.columns]
+        return df
+    except Exception as e:
+        print(f"Error fetching milestones: {e}")
+        return pd.DataFrame()
+
+def load_roster_from_gdoc():
     fallback_leadership = [
         {"name": "Arun Sharma", "role": "Co-founder", "email": "arun@gettenacious.com"},
         {"name": "Yabebal Fantaye", "role": "Co-founder", "email": "yabebal@gettenacious.com"},
@@ -125,95 +138,46 @@ def load_roster_from_gdoc() -> tuple[dict, list]:
         {"name": "Maureen Kiprono", "role": "Finance Manager", "email": "maureen@gettenacious.com"},
     ]
     
-    gdoc_url = "https://docs.google.com/document/d/1F4VTDDU6lMLorgEjucZCmPlUHf0OC3BkRyQUXrf9nd4/export?format=txt"
+    parsed_roster = {}
+    aliases = {}
     try:
-        import urllib.request
-        import ssl
-        import certifi
-        
-        ctx = ssl.create_default_context(cafile=certifi.where())
-        request = urllib.request.Request(gdoc_url, headers={"User-Agent": "TenaciousGrowthDashboard/1.0"})
-        with urllib.request.urlopen(request, context=ctx, timeout=10) as response:
-            text = response.read().decode("utf-8", errors="replace")
+        m_df = load_milestones_data_v2()
+        if not m_df.empty and "Email" in m_df.columns:
+            current_name = "Unknown"
+            current_client = "Unassigned"
+            primary_email = None
             
-        lines = [line.strip() for line in text.splitlines()]
-        
-        parsed_roster = {}
-        parsed_leadership = []
-        
-        lead_start = -1
-        tech_start = -1
-        tech_end = -1
-        
-        for i, line in enumerate(lines):
-            if "Leadership & Core Team:" in line:
-                lead_start = i
-            elif "Technical Team (Consultants" in line:
-                tech_start = i
-            elif "You don’t need to memorize" in line:
-                tech_end = i
+            for _, row in m_df.iterrows():
+                name_val = str(row.get("Name", "")).strip()
+                if name_val and name_val.lower() != "nan":
+                    current_name = name_val
+                    client_val = str(row.get("Client", "")).strip()
+                    if client_val and client_val.lower() != "nan":
+                        current_client = client_val
+                    primary_email = None
                 
-        if lead_start != -1 and tech_start != -1:
-            i = lead_start + 1
-            while i < tech_start:
-                line = lines[i]
-                if line.lower() in ("name", "role", "") or not line.strip():
-                    i += 1
-                    continue
-                if i + 1 < tech_start:
-                    name = line.strip().replace("\t", "")
-                    role = lines[i+1].strip().replace("\t", "")
-                    email = guess_email(name)
-                    parsed_leadership.append({"name": name, "role": role, "email": email})
-                    i += 2
-                else:
-                    i += 1
-                    
-        if tech_start != -1:
-            end_limit = tech_end if tech_end != -1 else len(lines)
-            i = tech_start + 1
-            while i < end_limit:
-                line = lines[i]
-                if line.lower() in ("name", "client", "") or not line.strip():
-                    i += 1
-                    continue
-                if i + 1 < end_limit:
-                    name = line.strip().replace("\t", "")
-                    client = lines[i+1].strip().replace("\t", "")
-                    
-                    # Normalize client names
-                    if "ozone" in client.lower(): client = "Ozone"
-                    elif "computrition" in client.lower(): client = "Computrition"
-                    elif "rewardops" in client.lower(): client = "RewardOps"
-                    elif "vanson" in client.lower(): client = "Vanson Technology Services"
-                    elif "modo yoga" in client.lower(): client = "Modo Yoga"
-                    elif "modo" in client.lower(): client = "Modo"
-                    elif "mir" in client.lower(): client = "MIR Digital"
-                    elif "shega" in client.lower(): client = "Shega"
-                    elif "navigate" in client.lower(): client = "Navigate"
-                    elif "scg" in client.lower(): client = "SCG"
-                    elif "carlson" in client.lower(): client = "Carlson"
-                    elif "tech" in client.lower(): client = "Tech"
-                    
-                    email = guess_email(name)
-                    parsed_roster[email] = {"name": name, "client": client}
-                    i += 2
-                else:
-                    i += 1
-                    
+                email_val = str(row.get("Email", "")).strip().lower()
+                if email_val and email_val != "nan":
+                    if not primary_email:
+                        primary_email = email_val
+                        parsed_roster[primary_email] = {"name": current_name, "client": current_client}
+                    else:
+                        aliases[email_val] = primary_email
+                        
         if parsed_roster:
-            return parsed_roster, parsed_leadership
-            
+            return parsed_roster, fallback_leadership, aliases
     except Exception as e:
-        pass
+        print(f"Error loading roster from milestones: {e}")
         
-    return fallback_roster, fallback_leadership
+    return fallback_roster, fallback_leadership, {}
 
 # Execute dynamically at startup to populate imported weekly_checks.TALENT_ROSTER
+GLOBAL_ALIASES = {}
 try:
-    gdoc_roster, leadership_contacts = load_roster_from_gdoc()
+    gdoc_roster, leadership_contacts, gdoc_aliases = load_roster_from_gdoc()
     TALENT_ROSTER.clear()
     TALENT_ROSTER.update(gdoc_roster)
+    GLOBAL_ALIASES.update(gdoc_aliases)
 except Exception:
     leadership_contacts = [
         {"name": "Arun Sharma", "role": "Co-founder", "email": "arun@gettenacious.com"},
@@ -621,17 +585,7 @@ def _render_check(c: Check) -> None:
     )
 
 
-@st.cache_data(ttl=600, show_spinner=False)
-def load_milestones_data_v2() -> pd.DataFrame:
-    url = "https://docs.google.com/spreadsheets/d/1kFT1zlQwPfQ8cdz_Vop51ZCPjOgiXYrOv8xbn0J8dRc/export?format=csv&gid=1924842637"
-    try:
-        df = pd.read_csv(url)
-        # Normalize column names by stripping trailing whitespace
-        df.columns = [str(c).strip() for c in df.columns]
-        return df
-    except Exception as e:
-        print(f"Error fetching milestones: {e}")
-        return pd.DataFrame()
+
 
 
 @st.cache_data(ttl=300, show_spinner="Loading and enriching sheet data…")
@@ -648,26 +602,24 @@ def _load_enriched(csv_url: str | None = None):
     if "email" in raw_df.columns:
         raw_df["email"] = raw_df["email"].str.strip().str.lower()
         
-        EMAIL_ALIASES = {
-            "smlnegash@gmail.com": "samuel@gettenacious.com",
-            "belay@10academy.org": "belay@gettenacious.com",
-            "alazar.getachew@coraloyalty.com": "alazar@gettenacious.com",
-            "lillianalehegn123@gmail.com": "lillian@gettenacious.com",
-            "mamamohammed31@gmail.com": "mama@gettenacious.com",
-            "nahom.fix@gmail.com": "nahom@gettenacious.com",
-            "meronabdo954@gmail.com": "meron@gettenacious.com",
-        }
-        raw_df["email"] = raw_df["email"].replace(EMAIL_ALIASES)
+        # Map known secondary aliases from the Google Sheet
+        raw_df["email"] = raw_df["email"].replace(GLOBAL_ALIASES)
         
-        # Dynamically add any unrecognized email in raw_df to TALENT_ROSTER
+        # Fuzzy match unrecognized Telegram bot aliases by first name
+        new_aliases = {}
         for email in raw_df["email"].dropna().unique():
-            email_clean = email.strip().lower()
-            if email_clean not in TALENT_ROSTER:
-                local_part = email_clean.split("@")[0]
-                name = local_part.replace(".", " ").replace("_", " ").strip().title()
-                TALENT_ROSTER[email_clean] = {"name": name, "client": "Unassigned / New"}
+            if email not in TALENT_ROSTER:
+                local_part = email.split("@")[0]
+                for primary_email, info in TALENT_ROSTER.items():
+                    name_parts = info["name"].lower().split()
+                    if name_parts and (local_part == name_parts[0] or local_part in name_parts):
+                        new_aliases[email] = primary_email
+                        break
+                        
+        if new_aliases:
+            raw_df["email"] = raw_df["email"].replace(new_aliases)
 
-        # Filter strictly to active talents from the roster
+        # Filter strictly to active talents from the roster (drops inactive)
         raw_df = raw_df[raw_df["email"].isin(TALENT_ROSTER.keys())]
 
     
