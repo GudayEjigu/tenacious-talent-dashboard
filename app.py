@@ -1820,20 +1820,19 @@ elif view_mode == "talent_profiles":
             if page_key not in st.session_state:
                 st.session_state[page_key] = 0
                 
+            def change_page(delta):
+                st.session_state[page_key] += delta
+                
             curr_page = st.session_state[page_key]
             
             # Pagination controls
             col1, col2, col3 = st.columns([1, 2, 1])
             with col1:
-                if st.button("⬅️ Previous", disabled=(curr_page == 0), use_container_width=True):
-                    st.session_state[page_key] -= 1
-                    st.rerun()
+                st.button("⬅️ Newer", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
             with col2:
                 st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {curr_page + 1} of {total_pages}</div>", unsafe_allow_html=True)
             with col3:
-                if st.button("Next ➡️", disabled=(curr_page == total_pages - 1), use_container_width=True):
-                    st.session_state[page_key] += 1
-                    st.rerun()
+                st.button("Older ➡️", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
             
             st.markdown("---")
             
