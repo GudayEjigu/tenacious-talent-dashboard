@@ -617,6 +617,7 @@ def _render_check(c: Check) -> None:
         f'<span style="color: {bullet_color}; font-size: 1.15rem; margin-right: 8px; line-height: 1; vertical-align: middle;">●</span>'
         f'<span style="line-height: 1.4;"><b>{c.label}</b>{": " + c.detail if c.detail else ""}</span>'
         f'</div>',
+        unsafe_allow_html=True
     )
 
 
