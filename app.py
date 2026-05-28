@@ -278,7 +278,7 @@ st.markdown(
     }
 
     [data-testid="block-container"] {
-        max-width: 1050px !important;
+        max-width: 1300px !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
     }
