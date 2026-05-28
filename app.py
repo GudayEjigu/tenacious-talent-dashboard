@@ -1457,29 +1457,15 @@ elif view_mode == "talent_profiles":
         doj = str(matched_row.get("Date of joining", ""))
         months_past = str(matched_row.get("Months past", ""))
         
-        next_milestone_label = "Next Milestone"
-        next_milestone_val = "--"
-        
-        try:
-            mp_float = float(months_past.replace("months", "").strip())
-            if mp_float < 6:
-                next_milestone_label = "6 Months Mark"
-                next_milestone_val = str(matched_row.get("6 months mark", "--"))
-            elif mp_float < 12:
-                next_milestone_label = "12 Months Mark"
-                next_milestone_val = str(matched_row.get("12 months mark", "--"))
-            else:
-                next_milestone_label = "18 Months Mark"
-                next_milestone_val = str(matched_row.get("18 months mark", "--"))
-        except Exception:
-            pass
-            
         if doj and doj.lower() != "nan":
             st.markdown("<br/>", unsafe_allow_html=True)
             m1, m2, m3 = st.columns(3)
             m1.metric("Date of Joining", doj)
             m2.metric("Tenure", format_tenure(months_past))
-            m3.metric(next_milestone_label, next_milestone_val if next_milestone_val.lower() != "nan" else "--")
+            with m3:
+                st.caption("Email Aliases")
+                for e in TALENT_ROSTER[selected_talent].get("emails", [selected_talent]):
+                    st.code(e, language="text")
             st.markdown("---")
             
     progress_rows = []
