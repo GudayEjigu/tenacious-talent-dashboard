@@ -160,9 +160,14 @@ def load_roster_from_gdoc():
                 if email_val and email_val != "nan":
                     if not primary_email:
                         primary_email = email_val
-                        parsed_roster[primary_email] = {"name": current_name, "client": current_client}
+                        parsed_roster[primary_email] = {
+                            "name": current_name, 
+                            "client": current_client,
+                            "emails": [email_val]
+                        }
                     else:
                         aliases[email_val] = primary_email
+                        parsed_roster[primary_email]["emails"].append(email_val)
                         
         if parsed_roster:
             return parsed_roster, fallback_leadership, aliases
@@ -1846,6 +1851,9 @@ elif view_mode == "team_directory":
                             )
                         break
             
+            all_emails = TALENT_ROSTER[email].get("emails", [email])
+            escaped_emails_html = "".join([f'<div style="font-size: 0.75rem; color: #64748b; word-break: break-all; margin-bottom: 2px;">{html.escape(e)}</div>' for e in all_emails])
+            
             box_html = (
                 f'<a href="/?selected_talent={email}" target="_self" style="'
                 f'  display: flex;'
@@ -1864,7 +1872,7 @@ elif view_mode == "team_directory":
                 f'  <div class="talent-box-icon" style="font-size: 4rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; line-height: 1;">👤</div>'
                 f'  <div style="font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 6px; word-break: break-word;">{escaped_name}</div>'
                 f'  <div style="font-weight: 600; font-size: 0.85rem; color: #585ba6; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">{escaped_client}</div>'
-                f'  <div style="font-size: 0.75rem; color: #64748b; word-break: break-all;">{escaped_email}</div>'
+                f'  {escaped_emails_html}'
                 f'  {milestone_html}'
                 f'</a>'
             )
