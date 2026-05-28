@@ -229,17 +229,53 @@ st.set_page_config(
     page_title="Talent management weekly overview",
     page_icon="icon.png",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # --- Styling & CSS ---
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
     
     html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"], [data-testid="stHeader"], [data-testid="stMarkdownContainer"], button, input, select, textarea, table, td, th, p, h1, h2, h3, h4, h5, h6 {
-        font-family: 'Montserrat', sans-serif !important;
+        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    }
+
+    h1, h1 *, div[data-testid="stMarkdownContainer"] h1, div[data-testid="stHeadingWithActionElements"] h1, div[data-testid="stMarkdownContainer"] h1 * {
+        font-size: 3.5rem !important;
+        font-weight: 800 !important;
+        color: #1e293b !important;
+        margin-bottom: 0.2rem !important;
+        letter-spacing: -0.02em !important;
+        line-height: 1.2 !important;
+    }
+    h2, h2 *, div[data-testid="stMarkdownContainer"] h2, div[data-testid="stHeadingWithActionElements"] h2, div[data-testid="stMarkdownContainer"] h2 * {
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        margin-top: 1.2rem !important;
+        margin-bottom: 0.6rem !important;
+        letter-spacing: -0.01em !important;
+        line-height: 1.3 !important;
+    }
+    h3, h3 *, div[data-testid="stMarkdownContainer"] h3, div[data-testid="stHeadingWithActionElements"] h3, div[data-testid="stMarkdownContainer"] h3 * {
+        font-size: 1.8rem !important;
+        font-weight: 600 !important;
+        color: #334155 !important;
+        margin-top: 0.6rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+    h4, [data-testid="stHeader"] h4 {
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
+        color: #475569 !important;
+    }
+    p, span, li, td, th, div, a {
+        font-size: 0.78rem !important;
+    }
+    .stMarkdown caption, [data-testid="stMarkdownContainer"] caption, label {
+        font-size: 0.75rem !important;
     }
 
     .main, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"] {
@@ -257,19 +293,19 @@ st.markdown(
     }
 
     /* Original check-in badges converted to transparent list bullets */
-    .check-ok   { padding: 4px 0 !important; margin: 2px 0 !important; background: transparent !important; color: #334155 !important; font-size: 0.95rem !important; }
-    .check-warn { padding: 4px 0 !important; margin: 2px 0 !important; background: transparent !important; color: #334155 !important; font-size: 0.95rem !important; }
-    .check-watch{ padding: 4px 0 !important; margin: 2px 0 !important; background: transparent !important; color: #334155 !important; font-size: 0.95rem !important; }
-    .week-head  { font-size: 1.2rem; font-weight: 700; margin: 1rem 0 0.5rem 0; }
-    .answer-box { background: #f8f9fa; padding: 0.75rem 1rem; border-radius: 8px;
-                  margin: 0.35rem 0 0.75rem 0; white-space: pre-wrap; font-size: 0.95rem; color: #334155; }
+    .check-ok   { padding: 3px 0 !important; margin: 1px 0 !important; background: transparent !important; color: #334155 !important; font-size: 0.8rem !important; }
+    .check-warn { padding: 3px 0 !important; margin: 1px 0 !important; background: transparent !important; color: #334155 !important; font-size: 0.8rem !important; }
+    .check-watch{ padding: 3px 0 !important; margin: 1px 0 !important; background: transparent !important; color: #334155 !important; font-size: 0.8rem !important; }
+    .week-head  { font-size: 1.05rem; font-weight: 700; margin: 0.8rem 0 0.4rem 0; }
+    .answer-box { background: #f8f9fa; padding: 0.6rem 0.8rem; border-radius: 8px;
+                  margin: 0.3rem 0 0.6rem 0; white-space: pre-wrap; font-size: 0.8rem; color: #334155; }
                   
     /* HR Row container styles */
     .hr-row {
         display: flex;
         align-items: center;
-        padding: 1rem 1.2rem;
-        margin-bottom: 0.6rem;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.5rem;
         background: #ffffff;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.03);
@@ -288,11 +324,11 @@ st.markdown(
     }
     .name-text {
         font-weight: 700;
-        font-size: 1.05rem;
+        font-size: 0.88rem;
         color: #1e293b;
     }
     .email-text {
-        font-size: 0.8rem;
+        font-size: 0.72rem;
         color: #64748b;
     }
     
@@ -305,9 +341,9 @@ st.markdown(
     
     /* HR Pill Badges */
     .hr-badge {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         font-weight: 700;
-        padding: 0.35rem 0.75rem;
+        padding: 0.25rem 0.6rem;
         border-radius: 20px;
         text-align: center;
         display: inline-block;
@@ -417,6 +453,16 @@ st.markdown(
     [data-testid="stSidebar"] {
         background-color: #ffffff !important; /* Premium Pure White */
         border-right: 1px solid #e2e8f0 !important;
+        min-width: 260px !important;
+        max-width: 260px !important;
+        width: 260px !important;
+        height: 100vh !important;
+    }
+    [data-testid="stSidebar"] > div:first-child {
+        padding-top: 0rem !important; /* Move logo and content to the absolute top */
+    }
+    [data-testid="stSidebarUserContent"] {
+        padding-top: 0rem !important; /* Move logo and content to the absolute top */
     }
     [data-testid="stSidebar"] hr {
         border-top: 1px solid #e2e8f0 !important;
@@ -432,108 +478,46 @@ st.markdown(
     [data-testid="stSidebar"] label {
         color: #1e3b70 !important; /* Deep Navy */
         font-weight: 700 !important;
-        font-size: 0.8rem !important;
+        font-size: 0.72rem !important;
         text-transform: uppercase !important;
         letter-spacing: 0.05em !important;
         margin-bottom: 0.4rem !important;
     }
-    /* Buttons inside st.button wrapper in light sidebar (unclicked/outline style) */
+    /* Sidebar Flat Navigation Buttons - base layout */
     [data-testid="stSidebar"] [data-testid="stButton"] button {
-        background-color: #ffffff !important; /* Pure white background */
-        border: 2px solid #585ba6 !important; /* Brand purple-blue border */
+        background-color: transparent !important;
+        border: none !important;
         border-radius: 8px !important;
-        transition: all 0.2s ease-in-out !important;
+        text-align: left !important;
+        padding: 0.55rem 0.85rem !important; /* Slight padding inside button */
+        width: 100% !important;
+        color: #64748b !important; /* Slate/gray text */
+        font-weight: 500 !important;
+        font-size: 0.8rem !important;
         box-shadow: none !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stButton"] button p, 
-    [data-testid="stSidebar"] [data-testid="stButton"] button span, 
-    [data-testid="stSidebar"] [data-testid="stButton"] button div {
-        color: #585ba6 !important; /* Brand purple-blue text */
-        font-weight: 600 !important;
+        transition: background 0.15s, color 0.15s !important;
+        display: flex !important;
+        justify-content: flex-start !important;
+        align-items: center !important; /* Center vertically */
+        gap: 8px !important; /* Small gap between icon and text */
     }
     [data-testid="stSidebar"] [data-testid="stButton"] button:hover {
-        background-color: #585ba6 !important; /* Brand purple-blue filled on hover */
-        border-color: #585ba6 !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 10px rgba(88, 91, 166, 0.15) !important;
+        background-color: #f1f5f9 !important; /* Subtle light gray hover background */
+        color: #1e293b !important;
+        transform: none !important;
+        box-shadow: none !important;
     }
-    [data-testid="stSidebar"] [data-testid="stButton"] button:hover p, 
-    [data-testid="stSidebar"] [data-testid="stButton"] button:hover span, 
-    [data-testid="stSidebar"] [data-testid="stButton"] button:hover div {
-        color: #ffffff !important; /* White text on hover */
-    }
-
-    /* Selected state styling for st.segmented_control and st.pills in sidebar */
-    [data-testid="stSidebar"] button[data-testid="stBaseButton-primary"],
-    [data-testid="stSidebar"] button[aria-selected="true"],
-    [data-testid="stSidebar"] button[data-selected="true"],
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[aria-selected="true"],
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[aria-selected="true"],
-    [data-testid="stSidebar"] div[class*="stPills"] button[aria-selected="true"],
-    [data-testid="stSidebar"] div[class*="stSegmentedControl"] button[aria-selected="true"] {
-        background-color: #585ba6 !important; /* Purple-blue from logo */
-        color: #ffffff !important;
-        border: 1px solid #585ba6 !important;
-        font-weight: 600 !important;
-    }
-    [data-testid="stSidebar"] button[data-testid="stBaseButton-primary"] p,
-    [data-testid="stSidebar"] button[data-testid="stBaseButton-primary"] span,
-    [data-testid="stSidebar"] button[data-testid="stBaseButton-primary"] div,
-    [data-testid="stSidebar"] button[aria-selected="true"] p, 
-    [data-testid="stSidebar"] button[aria-selected="true"] span, 
-    [data-testid="stSidebar"] button[aria-selected="true"] div,
-    [data-testid="stSidebar"] button[data-selected="true"] p,
-    [data-testid="stSidebar"] button[data-selected="true"] span,
-    [data-testid="stSidebar"] button[data-selected="true"] div {
-        color: #ffffff !important;
-        font-weight: 600 !important;
-    }
-
-    /* Unselected state styling for st.segmented_control and st.pills in sidebar */
-    [data-testid="stSidebar"] button[aria-selected="false"],
-    [data-testid="stSidebar"] button[data-selected="false"],
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"],
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"],
-    [data-testid="stSidebar"] div[class*="stPills"] button[data-testid="stBaseButton-secondary"],
-    [data-testid="stSidebar"] div[class*="stSegmentedControl"] button[data-testid="stBaseButton-secondary"] {
-        background-color: #f8fafc !important;
-        color: #475569 !important;
-        border: 1px solid #e2e8f0 !important;
-    }
-    [data-testid="stSidebar"] button[aria-selected="false"] p, 
-    [data-testid="stSidebar"] button[aria-selected="false"] span, 
-    [data-testid="stSidebar"] button[aria-selected="false"] div,
-    [data-testid="stSidebar"] button[data-selected="false"] p,
-    [data-testid="stSidebar"] button[data-selected="false"] span,
-    [data-testid="stSidebar"] button[data-selected="false"] div,
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"] p,
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"] span,
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"] div,
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"] p,
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"] span,
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"] div {
-        color: #475569 !important;
-    }
-    [data-testid="stSidebar"] button[aria-selected="false"]:hover,
-    [data-testid="stSidebar"] button[data-selected="false"]:hover,
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"]:hover,
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"]:hover {
-        background-color: #f1f5f9 !important;
-        border-color: #cbd5e1 !important;
-    }
-    [data-testid="stSidebar"] button[aria-selected="false"]:hover p, 
-    [data-testid="stSidebar"] button[aria-selected="false"]:hover span, 
-    [data-testid="stSidebar"] button[aria-selected="false"]:hover div,
-    [data-testid="stSidebar"] button[data-selected="false"]:hover p,
-    [data-testid="stSidebar"] button[data-selected="false"]:hover span,
-    [data-testid="stSidebar"] button[data-selected="false"]:hover div,
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"]:hover p,
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"]:hover span,
-    [data-testid="stSidebar"] div[data-testid="stPills"] button[data-testid="stBaseButton-secondary"]:hover div,
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"]:hover p,
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"]:hover span,
-    [data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[data-testid="stBaseButton-secondary"]:hover div {
-        color: #1e3b70 !important; /* Deep Navy */
+    [data-testid="stSidebar"] [data-testid="stButton"] button p,
+    [data-testid="stSidebar"] [data-testid="stButton"] button span,
+    [data-testid="stSidebar"] [data-testid="stButton"] button div {
+        color: inherit !important;
+        font-weight: inherit !important;
+        text-align: left !important;
+        display: flex !important;
+        align-items: center !important; /* Vertically center icon and text */
+        gap: 8px !important; /* Flex gap */
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     [data-testid="stSidebar"] p {
@@ -830,14 +814,14 @@ else:
 
 # 3. If no data has been loaded, display the beautiful branded setup/upload screen!
 if df is None:
-    st.title("📊 Tenacious Growth Dashboard")
+    st.title("Tenacious Growth Dashboard")
     st.markdown("### Welcome! Let's connect your weekly check-in data.")
     st.info(
         "To get started, you can either **upload a CSV export** of your Google Sheet directly, "
         "or **paste a shared Google Sheets link**."
     )
     
-    tab_upload, tab_link = st.tabs(["📁 Upload CSV File (Private & Local)", "🔗 Link Google Sheet"])
+    tab_upload, tab_link = st.tabs(["Upload CSV File (Private & Local)", "Link Google Sheet"])
     
     with tab_upload:
         st.markdown("#### 1. Download your Google Sheet as a CSV file:")
@@ -862,7 +846,7 @@ if df is None:
                 
                 st.session_state.uploaded_df = df_scored
                 st.session_state.uploaded_parse_info = p_info
-                st.success("✅ CSV uploaded and parsed successfully!")
+                st.success("CSV uploaded and parsed successfully!")
                 st.rerun()
             except Exception as ex:
                 st.error(f"Error parsing uploaded CSV: {ex}")
@@ -870,7 +854,7 @@ if df is None:
     with tab_link:
         st.markdown("#### Paste your Google Sheet sharing link:")
         st.info(
-            "💡 **Important:** Make sure the sheet's general access is set to **'Anyone with the link can view'** "
+            "**Important:** Make sure the sheet's general access is set to **'Anyone with the link can view'** "
             "so the dashboard can fetch the data automatically."
         )
         override = st.text_input("Google Sheets Link (shared or published CSV URL)", value=get_secret("sheet_csv_url", ""))
@@ -880,7 +864,7 @@ if df is None:
                 df_scored, p_info = _load_enriched(override)
                 st.session_state.uploaded_df = df_scored
                 st.session_state.uploaded_parse_info = p_info
-                st.success("✅ Linked to Google Sheet successfully!")
+                st.success("Linked to Google Sheet successfully!")
                 st.rerun()
             except Exception as e2:
                 st.error(f"Could not load from Google Sheet link: {e2}")
@@ -901,7 +885,7 @@ df["talent"] = df["email"].map(display_name)
 _all_people = sorted(list({e for e in TALENT_ROSTER.keys()}))
 # Only keep people who have submitted at least once
 _submitted_emails = set(df["email"].dropna().unique())
-people = [e for e in _all_people if e in _submitted_emails]
+people = _all_people
 name_by_email = {e: display_name(e) for e in people}
 
 # Filter valid unique weeks globally so they are available in both views
@@ -910,13 +894,11 @@ unique_weeks = [w for w in unique_weeks if w and str(w) != "NaT"]
 
 # --- Session State Initialization ---
 if "view_mode" not in st.session_state or st.session_state.view_mode not in [
-    "Executive Dashboard",
-    "Weekly Status Board",
-    "Talent Profiles & AI Coach",
-    "Team Directory (GDoc)",
-    "Analytics & Growth Alerts"
+    "team_directory",
+    "weekly_status",
+    "talent_profiles"
 ]:
-    st.session_state.view_mode = "Executive Dashboard"
+    st.session_state.view_mode = "team_directory"
 if "selected_talent" not in st.session_state:
     st.session_state.selected_talent = people[0] if people else None
 
@@ -925,198 +907,187 @@ if "selected_talent" in st.query_params:
     tgt_talent = st.query_params["selected_talent"]
     if tgt_talent in people:
         st.session_state.selected_talent = tgt_talent
-        st.session_state.view_mode = "Talent Profiles & AI Coach"
+        st.session_state.view_mode = "talent_profiles"
     st.query_params.clear()
 
-# --- Sidebar Navigation ---
-with st.sidebar:
-    st.image("logo.png", use_container_width=True)
-    st.markdown("<div style='margin-bottom: 1.25rem;'></div>", unsafe_allow_html=True)
-    
-    if st.session_state.selected_talent not in people and people:
-        st.session_state.selected_talent = people[0]
-        
-    nav_options = [
-        "Executive Dashboard",
-        "Weekly Status Board",
-        "Talent Profiles & AI Coach",
-        "Team Directory (GDoc)",
-        "Analytics & Growth Alerts"
-    ]
-    
-    view_mode = st.segmented_control(
-        "Navigation",
-        nav_options,
-        selection_mode="single",
-        default=st.session_state.view_mode,
-        key="view_mode_control"
-    )
-    if view_mode:
-        st.session_state.view_mode = view_mode
+# --- Top Navbar (Native Streamlit) ---
+view_mode = st.session_state.view_mode
+
+import base64 as _b64
+import os as _os
+_logo_b64 = ""
+try:
+    if _os.path.exists("logo.png"):
+        _logo_path = "logo.png"
     else:
-        view_mode = st.session_state.view_mode
+        _logo_path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "logo.png")
+    with open(_logo_path, "rb") as _f:
+        _logo_b64 = _b64.b64encode(_f.read()).decode()
+except Exception:
+    pass
+
+_logo_img = (
+    f'<img src="data:image/png;base64,{_logo_b64}" style="height: 56px; width: auto; max-height: 56px; display: block; margin-top: 0px;" alt="Tenacious" />'
+    if _logo_b64 else
+    '<span style="font-weight:800;font-size:1.4rem;color:#585ba6; line-height: 56px;">Tenacious</span>'
+)
+
+# Render sticky navbar using a named container
+with st.container(key="top_navbar"):
+    col_logo, col_nav1, col_nav2, col_nav3, col_space, col_refresh = st.columns([2.5, 1.4, 1.4, 1.4, 3, 1])
     
-    st.markdown("---")
-    
-    if st.button("↻ Refresh Data", use_container_width=True):
-        st.cache_data.clear()
-        st.rerun()
+    with col_logo:
+        st.markdown(_logo_img, unsafe_allow_html=True)
         
-    if st.session_state.uploaded_df is not None:
-        if st.button("📁 Reset / Load New Sheet", use_container_width=True):
-            st.session_state.uploaded_df = None
-            st.session_state.uploaded_parse_info = None
+    with col_nav1:
+        if st.button("Team Directory", key="btn_team_directory", use_container_width=True):
+            st.session_state.view_mode = "team_directory"
+            st.rerun()
+            
+    with col_nav2:
+        if st.button("Weekly Status", key="btn_weekly_status", use_container_width=True):
+            st.session_state.view_mode = "weekly_status"
+            st.rerun()
+            
+    with col_nav3:
+        if st.button("Talent Profiles", key="btn_talent_profiles", use_container_width=True):
+            st.session_state.view_mode = "talent_profiles"
+            st.rerun()
+            
+    with col_refresh:
+        if st.button("⟳ Refresh", key="btn_refresh", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
-        
-    st.caption(f"{len(people)} team members · {len(df)} check-ins")
 
-# --- VIEW: EXECUTIVE DASHBOARD ---
-if view_mode == "Executive Dashboard":
-    if not unique_weeks:
-        st.info("No weekly data available.")
-        st.stop()
-        
-    st.title("📊 Executive Dashboard")
-    st.caption("A premium overview of Tenacious Intelligence Corporation's software engineering talent operations.")
+# Apply CSS for the sticky navbar and the tab styling
+active_btn_key = f"btn_{st.session_state.view_mode}"
+
+st.markdown(
+    f"""
+    <style>
+    /* Make the container sticky at the top */
+    div.st-key-top_navbar {{
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 999999 !important;
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 12px rgba(88,91,166,0.07) !important;
+        padding: 0.5rem 2.5rem 0.5rem 2.5rem !important;
+        height: 80px !important;
+    }}
     
-    # 1. Summary Statistics Cards
-    total_talents = len(people)
+    /* Push main content below fixed navbar */
+    [data-testid="stAppViewContainer"] > .main {{
+        padding-top: 96px !important;
+    }}
+    /* Hide Streamlit's default sidebar collapse button if sidebar is visible */
+    [data-testid="stSidebarCollapseButton"] {{
+        top: 86px !important;
+    }}
+    /* Hide the Streamlit default top header bar */
+    [data-testid="stHeader"] {{
+        display: none !important;
+    }}
+    /* Adjust sidebar top so it starts below the navbar */
+    [data-testid="stSidebar"] {{
+        top: 80px !important;
+        height: calc(100vh - 80px) !important;
+    }}
     
-    talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
-    client_to_talents = {}
-    for e in people:
-        c = talent_to_client[e]
-        client_to_talents.setdefault(c, []).append(e)
-    total_clients = len(client_to_talents)
+    /* Center columns vertically in the navbar */
+    div.st-key-top_navbar [data-testid="column"] {{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }}
     
-    strategist_cnt = 0
-    optimizer_cnt = 0
-    executor_cnt = 0
+    /* Style all buttons in the navbar to look like tabs */
+    div.st-key-top_navbar button {{
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        border-bottom: 3px solid transparent !important;
+        padding: 0.6rem 0.5rem !important;
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+        min-height: 0 !important;
+        height: auto !important;
+        box-shadow: none !important;
+        transition: color 0.18s, border-color 0.18s !important;
+        margin-top: 10px !important;
+    }}
+    div.st-key-top_navbar button:hover {{
+        color: #585ba6 !important;
+        border-bottom: 3px solid #e2e8f0 !important;
+    }}
+    div.st-key-top_navbar button:focus:not(:focus-visible) {{
+        color: #64748b !important;
+    }}
+    div.st-key-top_navbar button p {{
+        font-size: 0.95rem !important;
+    }}
     
-    for email in people:
-        t_all = df[df["email"] == email]
-        if not t_all.empty:
-            latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
-            tier = latest_row.get("growth_tier")
-            if tier == "TIER_STRATEGIST" or "Strategist" in str(tier):
-                strategist_cnt += 1
-            elif tier == "TIER_OPTIMIZER" or "Optimizer" in str(tier):
-                optimizer_cnt += 1
-            else:
-                executor_cnt += 1
-                
-    c1, c2, c3, c4 = st.columns(4)
-    card_style = (
-        "background:linear-gradient(135deg,#f3f2ff 0%,#ebe9ff 100%);"
-        "border:1px solid #c7c5f0;border-radius:14px;padding:18px 20px;text-align:center;"
-        "box-shadow:0 4px 16px rgba(88,91,166,0.06);"
-    )
-    with c1:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Total Talents</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{total_talents}</div></div>', unsafe_allow_html=True)
-    with c2:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Active Clients</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{total_clients}</div></div>', unsafe_allow_html=True)
-    with c3:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">🧠 Strategists</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{strategist_cnt}</div></div>', unsafe_allow_html=True)
-    with c4:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">⚙️ Optimizers</div><div style="font-size:2rem;font-weight:800;color:#1e3b70;margin-top:5px;">{optimizer_cnt}</div></div>', unsafe_allow_html=True)
-        
-    st.markdown("<div style='height:25px'></div>", unsafe_allow_html=True)
+    /* Active tab styling */
+    div.st-key-top_navbar div.st-key-{active_btn_key} button {{
+        color: #585ba6 !important;
+        border-bottom: 3px solid #585ba6 !important;
+        font-weight: 700 !important;
+    }}
+    div.st-key-top_navbar div.st-key-{active_btn_key} button:focus:not(:focus-visible) {{
+        color: #585ba6 !important;
+    }}
+    div.st-key-top_navbar div.st-key-{active_btn_key} button p {{
+        font-weight: 700 !important;
+    }}
     
-    # Left Column: Alerts, Right Column: Leadership
-    col_alerts, col_lead = st.columns([1.8, 1.2])
+    /* Special styling for the refresh button to look like a small action button */
+    div.st-key-top_navbar div.st-key-btn_refresh button {{
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 6px !important;
+        padding: 0.45rem 1rem !important;
+        font-size: 0.85rem !important;
+        margin-top: 5px !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }}
+    div.st-key-top_navbar div.st-key-btn_refresh button p {{
+        font-size: 0.85rem !important;
+    }}
+    div.st-key-top_navbar div.st-key-btn_refresh button:hover {{
+        background: #f1f5f9 !important;
+        color: #1e293b !important;
+        border-color: #cbd5e1 !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+    }}
     
-    with col_alerts:
-        st.markdown("### ⚡ Real-Time Trajectory Alerts (Rolling 4-Weeks)")
-        
-        # Compile recent alerts
-        struggles = []
-        stretch_ready = []
-        ceo_mindset = []
-        
-        for email in people:
-            t_all = df[df["email"] == email]
-            if not t_all.empty:
-                latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
-                name = name_by_email.get(email, display_name(email))
-                
-                if bool(latest_row.get("alert_silent_struggle", False)):
-                    struggles.append((name, email))
-                if bool(latest_row.get("alert_ceo_mindset_candidate", False)):
-                    ceo_mindset.append((name, email))
-                elif bool(latest_row.get("alert_ready_for_stretch", False)):
-                    stretch_ready.append((name, email))
-                    
-        if not struggles and not stretch_ready and not ceo_mindset:
-            st.markdown(
-                '<div style="background-color: #ebfbee; border: 1px solid #b2f2bb; border-radius: 12px; '
-                'padding: 1.5rem; color: #2b8a3e; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px;">'
-                '🟢 <b>All systems stable.</b> No urgent struggles or stretch opportunities require action this week.'
-                '</div>', unsafe_allow_html=True
-            )
-        else:
-            if struggles:
-                for name, email in struggles:
-                    st.markdown(
-                        f'<div style="background-color: #fee2e2; border: 1px solid #fca5a5; border-radius: 10px; '
-                        f'padding: 0.85rem 1.2rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">'
-                        f'  <div>'
-                        f'    <span style="font-weight: 700; color: #991b1b;">🚨 Silent Struggle Alert: {name}</span>'
-                        f'    <div style="font-size: 0.8rem; color: #7f1d1d; margin-top: 2px;">Completed fewer tickets than expected for consecutive weeks with minimal commentary.</div>'
-                        f'  </div>'
-                        f'  <a href="/?selected_talent={email}" target="_self" style="background-color: #991b1b; color: white; '
-                        f'    padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none;">Investigate</a>'
-                        f'</div>', unsafe_allow_html=True
-                    )
-            if ceo_mindset:
-                for name, email in ceo_mindset:
-                    st.markdown(
-                        f'<div style="background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; '
-                        f'padding: 0.85rem 1.2rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">'
-                        f'  <div>'
-                        f'    <span style="font-weight: 700; color: #92400e;">🧠 CEO Mindset Candidate: {name}</span>'
-                        f'    <div style="font-size: 0.8rem; color: #78350f; margin-top: 2px;">Exhibits exceptional growth, mastery metrics, and highly proactive pro-business commentary.</div>'
-                        f'  </div>'
-                        f'  <a href="/?selected_talent={email}" target="_self" style="background-color: #d97706; color: white; '
-                        f'    padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none;">View Profile</a>'
-                        f'</div>', unsafe_allow_html=True
-                    )
-            if stretch_ready:
-                for name, email in stretch_ready:
-                    st.markdown(
-                        f'<div style="background-color: #f3f2ff; border: 1px solid #c7c5f0; border-radius: 10px; '
-                        f'padding: 0.85rem 1.2rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">'
-                        f'  <div>'
-                        f'    <span style="font-weight: 700; color: #585ba6;">🚀 Ready for Stretch: {name}</span>'
-                        f'    <div style="font-size: 0.8rem; color: #4338ca; margin-top: 2px;">Has achieved consistent technical mastery for &ge;3 of the last 4 weeks. Ideal for Stretch/Level-Up tasks.</div>'
-                        f'  </div>'
-                        f'  <a href="/?selected_talent={email}" target="_self" style="background-color: #585ba6; color: white; '
-                        f'    padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none;">View Profile</a>'
-                        f'</div>', unsafe_allow_html=True
-                    )
-                    
-    with col_lead:
-        st.markdown("### 👑 Leadership & Core Contacts")
-        for idx, member in enumerate(leadership_contacts):
-            st.markdown(
-                f'<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 10px; '
-                f'padding: 0.85rem 1rem; box-shadow: 0 4px 6px rgba(88,91,166,0.02); margin-bottom: 0.65rem; '
-                f'display: flex; align-items: center; gap: 10px;">'
-                f'  <div style="background-color: #f3f2ff; color: #585ba6; border-radius: 50%; '
-                f'    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; '
-                f'    font-weight: 700; font-size: 0.85rem;">'
-                f'    {member["name"][0]}'
-                f'  </div>'
-                f'  <div>'
-                f'    <div style="font-weight: 700; color: #1e293b; font-size: 0.88rem; line-height: 1.1;">{member["name"]}</div>'
-                f'    <div style="font-size: 0.72rem; color: #64748b;">{member["role"]} · {member["email"]}</div>'
-                f'  </div>'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-            
+    /* Fix markdown margin in the logo column */
+    div.st-key-top_navbar [data-testid="stMarkdownContainer"] p {{
+        margin-bottom: 0 !important;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# --- Sidebar actions (only shown in profiles view) ---
+if view_mode == "talent_profiles":
+    with st.sidebar:
+        if st.button("Refresh Data", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
+        if st.session_state.uploaded_df is not None:
+            if st.button("Reset / Load New Sheet", use_container_width=True):
+                st.session_state.uploaded_df = None
+                st.session_state.uploaded_parse_info = None
+                st.cache_data.clear()
+                st.rerun()
+
 # --- VIEW: WEEKLY STATUS BOARD ---
-elif view_mode == "Weekly Status Board":
+if view_mode == "weekly_status":
         
     # Maintain selected week in session state
     if "week_idx" not in st.session_state:
@@ -1309,7 +1280,7 @@ elif view_mode == "Weekly Status Board":
                 
                 if header == "Talent":
                     name = row.get("Talent", "")
-                    cell_html = f'<a href="/?selected_talent={email}" target="_self" class="cell-link" style="color: #1e3a8a !important; font-weight: 600;">👤 {html.escape(name)}</a>'
+                    cell_html = f'<a href="/?selected_talent={email}" target="_self" class="cell-link" style="color: #1e3a8a !important; font-weight: 600;">{html.escape(name)}</a>'
                     html_lines.append(f'        <td class="talent-td nowrap-column">{cell_html}</td>')
                 elif header in ("Timestamp", "Email address"):
                     cell_html = f'<a href="/?selected_talent={email}" target="_self" class="cell-link">{html.escape(str(val))}</a>'
@@ -1421,7 +1392,7 @@ elif view_mode == "Weekly Status Board":
                     st.metric("First-Pass QA %", qa_val)
 
 # --- VIEW: TALENT PROFILES ---
-elif view_mode == "Talent Profiles & AI Coach":
+elif view_mode == "talent_profiles":
     # Sidebar Profile selection grouped by Client
     with st.sidebar:
         st.subheader("Select Talent Profile")
@@ -1743,13 +1714,13 @@ elif view_mode == "Talent Profiles & AI Coach":
                     st.rerun()
             else:
                 # We have a key!
-                st.markdown("##### 🧠 Performance Analysis & Actionable Advice")
+                st.markdown("##### Performance Analysis & Actionable Advice")
                 
                 # Button to trigger AI generation
                 if f"ai_summary_{selected}" not in st.session_state:
                     st.session_state[f"ai_summary_{selected}"] = None
                     
-                generate_btn = st.button("🪄 Generate AI Assessment", type="primary", use_container_width=True)
+                generate_btn = st.button("Generate AI Assessment", type="primary", use_container_width=True)
                 
                 if generate_btn or st.session_state[f"ai_summary_{selected}"]:
                     if generate_btn:
@@ -1832,344 +1803,159 @@ elif view_mode == "Talent Profiles & AI Coach":
                 _render_check(c)
             st.markdown("---")
                     
-        # --- 3. Full Deep Logs (Newest First) ---
+        # --- 3. Full Deep Logs (Paginated Modal) ---
         st.markdown("---")
-        st.subheader("Detailed Weekly Submissions")
-
-        for i, (_, row) in enumerate(weeks_df.iterrows()):
-            prior = weeks_df.iloc[i + 1] if i + 1 < len(weeks_df) else None
-
+        
+        @st.dialog("Detailed Weekly Submissions", width="large")
+        def show_submissions_modal(w_df):
+            total_pages = len(w_df)
+            if total_pages == 0:
+                st.info("No submissions found.")
+                return
+            
+            page_key = f"modal_page_{st.session_state.selected_talent}"
+            if page_key not in st.session_state:
+                st.session_state[page_key] = 0
+                
+            curr_page = st.session_state[page_key]
+            
+            # Pagination controls
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col1:
+                if st.button("⬅️ Previous", disabled=(curr_page == 0), use_container_width=True):
+                    st.session_state[page_key] -= 1
+                    st.rerun()
+            with col2:
+                st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {curr_page + 1} of {total_pages}</div>", unsafe_allow_html=True)
+            with col3:
+                if st.button("Next ➡️", disabled=(curr_page == total_pages - 1), use_container_width=True):
+                    st.session_state[page_key] += 1
+                    st.rerun()
+            
+            st.markdown("---")
+            
+            # Render the selected week
+            row = w_df.iloc[curr_page]
+            prior = w_df.iloc[curr_page + 1] if curr_page + 1 < len(w_df) else None
+            
             checks = week_checks(row, prior)
             warn_count = sum(1 for c in checks if c.status == "warn")
-
+            
             week_label = format_week_label(row)
-            warn_badge = f"  {warn_count} item(s) need attention" if warn_count else ""
-            expander_label = f"Week of {week_label}{warn_badge}"
+            warn_badge = f"  ⚠️ {warn_count} item(s) need attention" if warn_count else ""
+            
+            st.subheader(f"Week of {week_label}{warn_badge}")
+            
+            for c in checks:
+                _render_check(c)
+                
+            st.markdown("**What they wrote**")
+            for col_key, label in [
+                ("key_achievements", "Key achievements"),
+                ("challenges", "Challenges"),
+                ("other_highlights", "Other highlights"),
+            ]:
+                val = str(row.get(col_key, "") or "").strip()
+                if val and val.lower() != "nan":
+                    st.markdown(f"*{label}*")
+                    st.write(val)
+                    
+            nums = []
+            if pd.notna(row.get("tickets_completed")):
+                nums.append(f"Tickets done: **{int(row['tickets_completed'])}**")
+            if pd.notna(row.get("tickets_expected")):
+                nums.append(f"Expected: **{int(row['tickets_expected'])}**")
+            if pd.notna(row.get("qa_first_pass_pct")):
+                nums.append(f"QA first-pass: **{row['qa_first_pass_pct']:.0f}%**")
+            if pd.notna(row.get("overall_rating")):
+                nums.append(f"Self-rating: **{int(row['overall_rating'])}/5**")
+            if pd.notna(row.get("met_expectations")) and str(row["met_expectations"]).strip():
+                nums.append(f"Met expectations: **{row['met_expectations']}**")
+            if nums:
+                st.markdown(" · ".join(nums))
 
-            # Most recent week open by default, rest collapsed
-            with st.expander(expander_label, expanded=(i == 0)):
-                for c in checks:
-                    _render_check(c)
-
-                st.markdown("**What they wrote**")
-                for col, label in [
-                    ("key_achievements", "Key achievements"),
-                    ("challenges", "Challenges"),
-                    ("other_highlights", "Other highlights"),
-                ]:
-                    val = str(row.get(col, "") or "").strip()
-                    if val:
-                        st.markdown(f"*{label}*")
-                        st.write(val)
-
-                nums = []
-                if pd.notna(row.get("tickets_completed")):
-                    nums.append(f"Tickets done: **{int(row['tickets_completed'])}**")
-                if pd.notna(row.get("tickets_expected")):
-                    nums.append(f"Expected: **{int(row['tickets_expected'])}**")
-                if pd.notna(row.get("qa_first_pass_pct")):
-                    nums.append(f"QA first-pass: **{row['qa_first_pass_pct']:.0f}%**")
-                if pd.notna(row.get("overall_rating")):
-                    nums.append(f"Self-rating: **{int(row['overall_rating'])}/5**")
-                if pd.notna(row.get("met_expectations")) and str(row["met_expectations"]).strip():
-                    nums.append(f"Met expectations: **{row['met_expectations']}**")
-                if nums:
-                    st.markdown(" · ".join(nums))
+        if st.button("View Detailed Weekly Submissions 📅", type="primary", use_container_width=True):
+            show_submissions_modal(weeks_df)
     else:
         st.info("No detailed check-in submissions have been submitted by this talent yet.")
 
 # --- VIEW: TEAM DIRECTORY (GDOC) ---
-elif view_mode == "Team Directory (GDoc)":
-    st.title("👤 Team Directory")
+elif view_mode == "team_directory":
+    st.title("Team Directory")
     st.caption("A dynamic, automatically updating index of all active software talents and their current client placements.")
     
-    # 1. Summary Statistics Cards
-    total_talents = len(people)
+    st.markdown(
+        """
+        <style>
+        .talent-box-link {
+            box-sizing: border-box;
+            transition: all 0.18s ease-in-out !important;
+        }
+        .talent-box-link:hover {
+            border-color: #585ba6 !important;
+            color: #585ba6 !important;
+            background-color: #f8fafc !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(88, 91, 166, 0.08) !important;
+        }
+        .talent-box-icon {
+            color: #94a3b8;
+            transition: transform 0.18s ease-in-out, color 0.18s ease-in-out !important;
+        }
+        .talent-box-link:hover .talent-box-icon {
+            color: #585ba6 !important;
+            transform: scale(1.1);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     
     talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
-    client_to_talents = {}
-    for e in people:
-        c = talent_to_client[e]
-        client_to_talents.setdefault(c, []).append(e)
-    total_clients = len(client_to_talents)
+    # Group and sort talents by client
+    sorted_talents = sorted(people, key=lambda e: (talent_to_client[e].lower(), name_by_email[e].lower()))
     
-    strategist_cnt = 0
-    optimizer_cnt = 0
-    executor_cnt = 0
+    # Assign a unique, very light background color per client
+    unique_clients = sorted(list(set(talent_to_client.values())))
+    bg_colors = ["#f8fafc", "#f0fdf4", "#fefce8", "#fff1f2", "#f5f3ff", "#f0f9ff", "#fdf4ff", "#ecfdf5"]
+    client_colors = {client: bg_colors[i % len(bg_colors)] for i, client in enumerate(unique_clients)}
     
-    for email in people:
-        t_all = df[df["email"] == email]
-        if not t_all.empty:
-            latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
-            tier = latest_row.get("growth_tier")
-            if tier == "TIER_STRATEGIST" or "Strategist" in str(tier):
-                strategist_cnt += 1
-            elif tier == "TIER_OPTIMIZER" or "Optimizer" in str(tier):
-                optimizer_cnt += 1
-            else:
-                executor_cnt += 1
-                
-    c1, c2, c3, c4 = st.columns(4)
-    card_style = (
-        "background:linear-gradient(135deg,#f3f2ff 0%,#ebe9ff 100%);"
-        "border:1px solid #c7c5f0;border-radius:14px;padding:15px;text-align:center;"
-        "box-shadow:0 4px 12px rgba(88,91,166,0.06);"
-    )
-    with c1:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">Total Talents</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{total_talents}</div></div>', unsafe_allow_html=True)
-    with c2:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">Active Clients</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{total_clients}</div></div>', unsafe_allow_html=True)
-    with c3:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">🧠 Strategists</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{strategist_cnt}</div></div>', unsafe_allow_html=True)
-    with c4:
-        st.markdown(f'<div style="{card_style}"><div style="color:#585ba6;font-size:0.75rem;font-weight:600;text-transform:uppercase;">⚙️ Optimizers</div><div style="font-size:1.8rem;font-weight:700;color:#1e3b70;margin-top:5px;">{optimizer_cnt}</div></div>', unsafe_allow_html=True)
-        
-    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
-    
-    # 1.5 Leadership & Core Contacts
-    st.markdown("### 👑 Leadership & Core Contacts")
-    
-    lead_cols = st.columns(4)
-    for idx, member in enumerate(leadership_contacts):
-        col_idx = idx % 4
-        with lead_cols[col_idx]:
-            st.markdown(
-                f'<div style="background-color: #f8fafc; border: 1px solid #c7c5f0; border-radius: 12px; '
-                f'padding: 1rem; box-shadow: 0 4px 6px rgba(88,91,166,0.04); margin-bottom: 1rem; '
-                f'display: flex; flex-direction: column; justify-content: space-between; height: 130px;">'
-                f'<div>'
-                f'  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">'
-                f'    <div style="background-color: #585ba6; color: white; border-radius: 50%; '
-                f'      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; '
-                f'      font-weight: 700; font-size: 0.9rem;">'
-                f'      {member["name"][0]}'
-                f'    </div>'
-                f'    <div>'
-                f'      <div style="font-weight: 700; color: #1e3b70; font-size: 0.9rem; line-height: 1.1;">{member["name"]}</div>'
-                f'      <div style="font-size: 0.72rem; color: #64748b;">{member["email"]}</div>'
-                f'    </div>'
-                f'  </div>'
-                f'  <div style="margin-top: 8px; font-size: 0.78rem; font-weight: 600; color: #475569;">'
-                f'    Role: {member["role"]}'
-                f'  </div>'
-                f'</div>'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-    st.markdown("<hr style='border-top:1px solid #e2e8f0; margin:1.5rem 0;' />", unsafe_allow_html=True)
-    
-    # 2. Render each Client's team roster
-    for client_name in sorted(client_to_talents.keys()):
-        st.markdown(f"### 🏢 {client_name} Team")
-        talents_in_client = client_to_talents[client_name]
-        
-        # Flex layout cards grouped in streamlit columns
-        cols = st.columns(3)
-        for i, email in enumerate(talents_in_client):
-            col_idx = i % 3
-            with cols[col_idx]:
-                name = name_by_email[email]
-                
-                t_all = df[df["email"] == email]
-                latest_status = "Incomplete Metrics"
-                status_css = "status-incomplete"
-                tier_lbl = "Executor"
-                tier_emoji = "✅"
-                
-                if not t_all.empty:
-                    latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
-                    lbl, emoji_s, css_class, explanation = generate_hr_explanation(latest_row)
-                    latest_status = lbl
-                    status_css = css_class
-                    
-                    raw_tier = latest_row.get("growth_tier", "TIER_EXECUTOR")
-                    if raw_tier == "TIER_STRATEGIST" or "Strategist" in str(raw_tier):
-                        tier_lbl = "Strategist"
-                        tier_emoji = "🧠"
-                    elif raw_tier == "TIER_OPTIMIZER" or "Optimizer" in str(raw_tier):
-                        tier_lbl = "Optimizer"
-                        tier_emoji = "⚙️"
-                
-                st.markdown(
-                    f'<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 12px; '
-                    f'padding: 1.25rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 0.5rem; '
-                    f'display: flex; flex-direction: column; justify-content: space-between; height: 145px;">'
-                    f'<div>'
-                    f'  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">'
-                    f'    <div style="background-color: #f3f2ff; color: #585ba6; border-radius: 50%; '
-                    f'      width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; '
-                    f'      font-weight: 700; font-size: 0.95rem;">'
-                    f'      {name[0]}'
-                    f'    </div>'
-                    f'    <div>'
-                    f'      <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem; line-height: 1.2;">{name}</div>'
-                    f'      <div style="font-size: 0.75rem; color: #64748b;">{email}</div>'
-                    f'    </div>'
-                    f'  </div>'
-                    f'  <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">'
-                    f'    <span style="font-size: 0.8rem; font-weight: 600; color: #475569;">Tier: {tier_emoji} {tier_lbl}</span>'
-                    f'    <span class="hr-badge {status_css}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-bottom: 0px;">{latest_status}</span>'
-                    f'  </div>'
-                    f'</div>'
-                    f'</div>',
-                    unsafe_allow_html=True
-                )
-                
-                # Dynamic navigation button
-                if st.button(f"🔍 View {name}'s Profile", key=f"btn_{email}", use_container_width=True):
-                    st.session_state.selected_talent = email
-                    st.session_state.selected_client = client_name
-                    st.session_state.view_mode = "Talent Profiles & AI Coach"
-                    st.rerun()
-                    
-        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
-
-# --- VIEW: ANALYTICS & GROWTH ALERTS ---
-elif view_mode == "Analytics & Growth Alerts":
-    st.title("📈 Analytics & Growth Alerts")
-    st.caption("Longitudinal rolling 4-week automated performance evaluations and growth alerts.")
-    
-    st.markdown("### 🏆 Automated Growth Tiers & Alerts Summary")
-    
-    growth_records = []
-    for email in people:
-        t_all = df[df["email"] == email]
-        name = name_by_email.get(email, display_name(email))
-        client_name = TALENT_ROSTER.get(email, {}).get("client", "Unassigned")
-        
-        latest_status = "Incomplete Metrics"
-        status_css = "status-incomplete"
-        tier_lbl = "Executor"
-        tier_emoji = "✅"
-        
-        silent_struggle = False
-        ready_stretch = False
-        ceo_mindset = False
-        
-        if not t_all.empty:
-            latest_row = t_all.sort_values("timestamp" if "timestamp" in t_all.columns else "week").iloc[-1]
-            lbl, emoji_s, css_class, explanation = generate_hr_explanation(latest_row)
-            latest_status = lbl
-            status_css = css_class
-            
-            raw_tier = latest_row.get("growth_tier", "TIER_EXECUTOR")
-            if raw_tier == "TIER_STRATEGIST" or "Strategist" in str(raw_tier):
-                tier_lbl = "Strategist"
-                tier_emoji = "🧠"
-            elif raw_tier == "TIER_OPTIMIZER" or "Optimizer" in str(raw_tier):
-                tier_lbl = "Optimizer"
-                tier_emoji = "⚙️"
-                
-            silent_struggle = bool(latest_row.get("alert_silent_struggle", False))
-            ready_stretch = bool(latest_row.get("alert_ready_for_stretch", False))
-            ceo_mindset = bool(latest_row.get("alert_ceo_mindset_candidate", False))
-            
-        growth_records.append({
-            "Talent": name,
-            "Email": email,
-            "Client Placement": client_name,
-            "Growth Tier": f"{tier_emoji} {tier_lbl}",
-            "Weekly Status": latest_status,
-            "status_css": status_css,
-            "Stretch Opportunity": "🚀 Stretch Ready" if ready_stretch else "SLA Solid",
-            "CEO Potential": "🌟 CEO Mindset" if ceo_mindset else "No Alert",
-            "Silent Struggle": "🚨 Silent Struggle" if silent_struggle else "Stable",
-            "silent_struggle": silent_struggle,
-            "ready_stretch": ready_stretch,
-            "ceo_mindset": ceo_mindset
-        })
-        
-    growth_df = pd.DataFrame(growth_records)
-    
-    # Render table in high fidelity HTML
     import html
     html_lines = []
-    html_lines.append('<div class="custom-table-container">')
-    html_lines.append('  <table class="custom-table">')
-    html_lines.append('    <thead>')
-    html_lines.append('      <tr>')
-    html_lines.append('        <th>Talent</th>')
-    html_lines.append('        <th>Client Placement</th>')
-    html_lines.append('        <th>Weekly Status</th>')
-    html_lines.append('        <th>Growth Tier</th>')
-    html_lines.append('        <th>Stretch Level-Up?</th>')
-    html_lines.append('        <th>Silent Struggle?</th>')
-    html_lines.append('        <th>CEO Potential?</th>')
-    html_lines.append('      </tr>')
-    html_lines.append('    </thead>')
-    html_lines.append('    <tbody>')
+    # Create a single continuous grid for all clients
+    html_lines.append('<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; width: 100%; margin-bottom: 2.25rem;">')
     
-    for idx, row in growth_df.iterrows():
-        html_lines.append('      <tr>')
-        # Talent Name Link
-        cell_link = f'<a href="/?selected_talent={row["Email"]}" target="_self" class="cell-link" style="color: #585ba6 !important; font-weight: 600;">👤 {html.escape(row["Talent"])}</a>'
-        html_lines.append(f'        <td class="talent-td nowrap-column">{cell_link}</td>')
-        # Client Link
-        client_link = f'<a href="/?selected_talent={row["Email"]}" target="_self" class="cell-link">{html.escape(row["Client Placement"])}</a>'
-        html_lines.append(f'        <td>{client_link}</td>')
-        # Weekly Status Badge
-        status_badge = f'<span class="hr-badge {row["status_css"]}" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem;">{row["Weekly Status"]}</span>'
-        html_lines.append(f'        <td>{status_badge}</td>')
-        # Growth Tier
-        tier_link = f'<a href="/?selected_talent={row["Email"]}" target="_self" class="cell-link" style="font-weight: 600; color: #1e3b70;">{html.escape(row["Growth Tier"])}</a>'
-        html_lines.append(f'        <td>{tier_link}</td>')
+    for email in sorted_talents:
+        name = name_by_email[email]
+        client_name = talent_to_client[email]
+        escaped_name = html.escape(name)
+        escaped_client = html.escape(client_name)
+        card_bg = client_colors[client_name]
         
-        # Stretch Ready
-        if row["ready_stretch"]:
-            stretch_badge = '<span class="hr-badge status-excelling" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem;">🚀 Stretch Ready</span>'
-        else:
-            stretch_badge = '<span class="hr-badge status-incomplete" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #64748b;">SLA Baseline</span>'
-        html_lines.append(f'        <td>{stretch_badge}</td>')
+        box_html = (
+            f'<a href="/?selected_talent={email}" target="_top" style="'
+            f'  display: flex;'
+            f'  flex-direction: column;'
+            f'  align-items: center;'
+            f'  justify-content: center;'
+            f'  aspect-ratio: 1 / 1;'
+            f'  padding: 1.5rem;'
+            f'  background-color: {card_bg};'
+            f'  border: 1.5px solid #e2e8f0;'
+            f'  border-radius: 16px;'
+            f'  color: #1e293b !important;'
+            f'  text-decoration: none !important;'
+            f'  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);'
+            f'  text-align: center;'
+            f'" class="talent-box-link">'
+            f'  <div class="talent-box-icon" style="font-size: 5rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; line-height: 1;">👤</div>'
+            f'  <div style="font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 8px; word-break: break-word;">{escaped_name}</div>'
+            f'  <div style="font-weight: 600; font-size: 0.85rem; color: #585ba6; text-transform: uppercase; letter-spacing: 0.05em;">{escaped_client}</div>'
+            f'</a>'
+        )
+        html_lines.append(box_html)
         
-        # Silent Struggle
-        if row["silent_struggle"]:
-            struggle_badge = '<span class="hr-badge status-concern" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem;">🚨 Struggling</span>'
-        else:
-            struggle_badge = '<span class="hr-badge status-solid" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #0c8599;">Stable</span>'
-        html_lines.append(f'        <td>{struggle_badge}</td>')
-        
-        # CEO Mindset
-        if row["ceo_mindset"]:
-            ceo_badge = '<span class="hr-badge status-mixed" style="margin: 8px 16px; font-size: 0.72rem; padding: 0.2rem 0.5rem; color: #b45309;">🌟 Candidate</span>'
-        else:
-            ceo_badge = '<span style="color:#aaa; font-size: 0.8rem; padding-left: 20px;">None</span>'
-        html_lines.append(f'        <td>{ceo_badge}</td>')
-        
-        html_lines.append('      </tr>')
-        
-    html_lines.append('    </tbody>')
-    html_lines.append('  </table>')
     html_lines.append('</div>')
-    
     st.markdown("\n".join(html_lines), unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
-    # ── Growth Signal & Tier Specifications Reference
-    c_tier, c_alert = st.columns(2)
-    with c_tier:
-        st.markdown(
-            '<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; height: 100%; box-shadow: 0 4px 6px rgba(88,91,166,0.02);">'
-            '  <h4 style="color:#585ba6; font-weight:700; margin-top:0;">🛡️ Performance Growth Tiers</h4>'
-            '  <p style="font-size:0.85rem; color:#64748b; margin-bottom: 1.25rem;">Automated classification determined on ingested performance metrics:</p>'
-            '  <ul style="font-size:0.85rem; color:#475569; padding-left: 20px; line-height: 1.6;">'
-            '    <li><b>🧠 TIER_STRATEGIST:</b> Technical mastery (tickets done &ge; expected & QA &ge; 95%) combined with high proactivity (extra-mile insights or artifacts).</li>'
-            '    <li><b>⚙️ TIER_OPTIMIZER:</b> Technical mastery achieved OR detailed escalation commentary despite missed baseline targets.</li>'
-            '    <li><b>✅ TIER_EXECUTOR:</b> Meeting general expectations and baseline performance targets stably.</li>'
-            '  </ul>'
-            '</div>',
-            unsafe_allow_html=True
-        )
-    with c_alert:
-        st.markdown(
-            '<div style="background-color: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; height: 100%; box-shadow: 0 4px 6px rgba(88,91,166,0.02);">'
-            '  <h4 style="color:#585ba6; font-weight:700; margin-top:0;">📡 Longitudinal Trajectory Alerts</h4>'
-            '  <p style="font-size:0.85rem; color:#64748b; margin-bottom: 1.25rem;">Evaluated using a rolling 4-week context window to flag systemic changes:</p>'
-            '  <ul style="font-size:0.85rem; color:#475569; padding-left: 20px; line-height: 1.6;">'
-            '    <li><b>🚀 Stretch Ready:</b> Outperforming baseline SLA (Mastery achieved) in &ge; 3 of the last 4 weeks. Candidate for level-up.</li>'
-            '    <li><b>🚨 Silent Struggle:</b> Underperforming ticket expectations for 2 consecutive weeks with minimal check-in commentary.</li>'
-            '    <li><b>🌟 CEO Mindset:</b> Outstanding level-up candidate demonstrating exceptional proactivity and stretch readiness for consecutive weeks.</li>'
-            '  </ul>'
-            '</div>',
-            unsafe_allow_html=True
-        )
+
+
