@@ -1836,15 +1836,15 @@ elif view_mode == "talent_profiles":
             with col1:
                 st.button("Older", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
             with col2:
-                display_page = total_pages - curr_page
-                st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {display_page} of {total_pages} (Week of {week_label})</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week of {week_label}</div>", unsafe_allow_html=True)
             with col3:
                 st.button("Newer", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
             
             st.markdown("---")
             
             t_name = name_by_email.get(st.session_state.selected_talent, "Talent")
-            st.markdown(f"### What {t_name} wrote")
+            first_name = t_name.split()[0] if t_name else "Talent"
+            st.markdown(f"### What {first_name} wrote")
             
             # Text responses in a fixed 3-column grid
             col_ach, col_cha, col_hi = st.columns(3)
