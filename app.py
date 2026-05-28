@@ -1085,18 +1085,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Sidebar actions (only shown in profiles view) ---
-if view_mode == "talent_profiles":
-    with st.sidebar:
-        if st.button("Refresh Data", use_container_width=True):
-            st.cache_data.clear()
-            st.rerun()
-        if st.session_state.uploaded_df is not None:
-            if st.button("Reset / Load New Sheet", use_container_width=True):
-                st.session_state.uploaded_df = None
-                st.session_state.uploaded_parse_info = None
-                st.cache_data.clear()
-                st.rerun()
+# --- Sidebar removed as requested ---
 
 # --- VIEW: WEEKLY STATUS BOARD ---
 if view_mode == "weekly_status":
@@ -1875,6 +1864,8 @@ elif view_mode == "team_directory":
     # Create a single continuous grid for all clients
     html_lines.append('<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; width: 100%; margin-bottom: 2.25rem;">')
     
+    m_df = load_milestones_data_v2()
+
     for email in sorted_talents:
         name = name_by_email[email]
         client_name = talent_to_client[email]
@@ -1882,13 +1873,29 @@ elif view_mode == "team_directory":
         escaped_client = html.escape(client_name)
         card_bg = client_colors[client_name]
         
+        milestone_html = ""
+        if not m_df.empty and "Name" in m_df.columns:
+            t_lower = name.lower().strip()
+            for _, row_m in m_df.iterrows():
+                name_val = str(row_m.get("Name", "")).lower().strip()
+                if name_val and name_val != "nan" and (t_lower in name_val or name_val in t_lower):
+                    doj = str(row_m.get("Date of joining", ""))
+                    months_past = str(row_m.get("Months past", ""))
+                    if doj and doj.lower() != "nan":
+                        milestone_html = (
+                            f'<div style="margin-top: 12px; font-size: 0.8rem; color: #475569; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.1); width: 100%;">'
+                            f'  <strong>Joined:</strong> {html.escape(doj)}<br/>'
+                            f'  <strong>Tenure:</strong> {html.escape(months_past)}'
+                            f'</div>'
+                        )
+                    break
+        
         box_html = (
             f'<a href="/?selected_talent={email}" target="_self" style="'
             f'  display: flex;'
             f'  flex-direction: column;'
             f'  align-items: center;'
             f'  justify-content: center;'
-            f'  aspect-ratio: 1 / 1;'
             f'  padding: 1.5rem;'
             f'  background-color: {card_bg};'
             f'  border: 1.5px solid #e2e8f0;'
@@ -1898,9 +1905,10 @@ elif view_mode == "team_directory":
             f'  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);'
             f'  text-align: center;'
             f'" class="talent-box-link">'
-            f'  <div class="talent-box-icon" style="font-size: 5rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; line-height: 1;">👤</div>'
-            f'  <div style="font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 8px; word-break: break-word;">{escaped_name}</div>'
+            f'  <div class="talent-box-icon" style="font-size: 4rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; line-height: 1;">👤</div>'
+            f'  <div style="font-weight: 700; font-size: 1.15rem; line-height: 1.25; margin-bottom: 6px; word-break: break-word;">{escaped_name}</div>'
             f'  <div style="font-weight: 600; font-size: 0.85rem; color: #585ba6; text-transform: uppercase; letter-spacing: 0.05em;">{escaped_client}</div>'
+            f'  {milestone_html}'
             f'</a>'
         )
         html_lines.append(box_html)
