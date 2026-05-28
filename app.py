@@ -277,6 +277,12 @@ st.markdown(
         background-color: #ffffff !important;
     }
 
+    [data-testid="block-container"] {
+        max-width: 1050px !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+
     [data-testid="stHeader"] {
         background-color: rgba(255, 255, 255, 0.95) !important;
         backdrop-filter: blur(8px) !important;
