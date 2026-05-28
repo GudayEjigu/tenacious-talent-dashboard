@@ -241,9 +241,9 @@ st.markdown(
         color: #475569 !important;
     }
 
-    .two-col-grid {
+    .talent-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 24px;
         width: 100%;
         margin-bottom: 2.25rem;
@@ -262,7 +262,7 @@ st.markdown(
         h4, h4 *, [data-testid="stHeader"] h4 {
             font-size: 1.125rem !important;
         }
-        .two-col-grid {
+        .talent-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -1882,7 +1882,7 @@ elif view_mode == "team_directory":
         card_bg = "#ffffff"
         
         # Start a new grid for this client (no text header as requested)
-        html_lines.append('<div class="two-col-grid">')
+        html_lines.append('<div class="talent-grid">')
         
         for email in emails:
             name = name_by_email[email]
