@@ -1825,27 +1825,23 @@ elif view_mode == "talent_profiles":
                 
             curr_page = st.session_state[page_key]
             
+            # Fetch data for the selected week early to construct the header
+            row = w_df.iloc[curr_page]
+            prior = w_df.iloc[curr_page + 1] if curr_page + 1 < len(w_df) else None
+            checks = week_checks(row, prior)
+            week_label = format_week_label(row)
+            
             # Pagination controls
             col1, col2, col3 = st.columns([1, 2, 1])
             with col1:
                 st.button("Older", disabled=(curr_page == total_pages - 1), use_container_width=True, on_click=change_page, args=(1,))
             with col2:
                 display_page = total_pages - curr_page
-                st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {display_page} of {total_pages}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align: center; font-weight: 600; padding-top: 8px;'>Week {display_page} of {total_pages} (Week of {week_label})</div>", unsafe_allow_html=True)
             with col3:
                 st.button("Newer", disabled=(curr_page == 0), use_container_width=True, on_click=change_page, args=(-1,))
             
             st.markdown("---")
-            
-            # Render the selected week
-            row = w_df.iloc[curr_page]
-            prior = w_df.iloc[curr_page + 1] if curr_page + 1 < len(w_df) else None
-            
-            checks = week_checks(row, prior)
-            
-            week_label = format_week_label(row)
-            
-            st.subheader(f"Week of {week_label}")
             
             t_name = name_by_email.get(st.session_state.selected_talent, "Talent")
             st.markdown(f"### What {t_name} wrote")
@@ -1886,6 +1882,7 @@ elif view_mode == "talent_profiles":
                 rating_val = f"{int(rating)} / 5" if pd.notna(rating) else "N/A"
                 st.metric("Self-Rating", rating_val)
 
+            st.markdown("---")
             for c in checks:
                 _render_check(c)
 
