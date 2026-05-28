@@ -1684,131 +1684,8 @@ elif view_mode == "talent_profiles":
 
         st.markdown("---")
 
-    # ── Gemini AI Talent Coach Section ────────────────────────────────────
+    # ── Detailed Weekly Submissions Modal ─────────────────────────────────
     if not weeks_df.empty:
-        st.markdown(
-            '<p style="font-size:1.25rem;font-weight:700;color:#585ba6;margin-bottom:4px;margin-top:1.5rem;">'
-            '🤖 AI Talent Coach Insights</p>'
-            '<p style="font-size:0.85rem;color:#7b7fa8;margin-top:0;">Generative AI-powered analysis of weekly performance logs</p>',
-            unsafe_allow_html=True
-        )
-        
-        # Check for GEMINI_API_KEY
-        gemini_key = get_secret("GEMINI_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
-        
-        # Allow manual override in session state
-        if "gemini_api_key_override" not in st.session_state:
-            st.session_state.gemini_api_key_override = ""
-            
-        active_key = st.session_state.gemini_api_key_override or gemini_key
-        
-        with st.expander("✨ Open AI Talent Coach Console", expanded=False):
-            if not active_key:
-                st.info("🔑 **Unlock AI Coaching Insights!** Get a free Gemini API key to start.")
-                st.markdown(
-                    "1. Go to [Google AI Studio](https://aistudio.google.com/) and click **Get API key**.\n"
-                    "2. Create a free API key in seconds.\n"
-                    "3. Paste your key below to unlock this feature on this session:"
-                )
-                input_key = st.text_input("Gemini API Key", type="password", key="key_input_field")
-                if input_key:
-                    st.session_state.gemini_api_key_override = input_key
-                    st.success("API Key updated for this session!")
-                    st.rerun()
-            else:
-                # We have a key!
-                st.markdown("##### Performance Analysis & Actionable Advice")
-                
-                # Button to trigger AI generation
-                if f"ai_summary_{selected}" not in st.session_state:
-                    st.session_state[f"ai_summary_{selected}"] = None
-                    
-                generate_btn = st.button("Generate AI Assessment", type="primary", use_container_width=True)
-                
-                if generate_btn or st.session_state[f"ai_summary_{selected}"]:
-                    if generate_btn:
-                        # Show spinner
-                        with st.spinner("Analyzing talent logs with Gemini..."):
-                            try:
-                                # 1. Prepare data for the prompt
-                                recent_submissions = weeks_df.head(4) # Analyze last 4 submissions
-                                if recent_submissions.empty:
-                                    st.warning("No submission history to analyze.")
-                                else:
-                                    import google.generativeai as genai
-                                    genai.configure(api_key=active_key)
-                                    
-                                    # Format history for prompt
-                                    history_text = ""
-                                    for idx, (_, r) in enumerate(recent_submissions.iterrows()):
-                                        week_lbl = format_week_label(r)
-                                        ach = r.get("key_achievements", "N/A")
-                                        chall = r.get("challenges", "N/A")
-                                        comp = r.get("tickets_completed", "N/A")
-                                        exp = r.get("tickets_expected", "N/A")
-                                        qa = r.get("qa_first_pass_pct", "N/A")
-                                        rat = r.get("overall_rating", "N/A")
-                                        tier = r.get("growth_tier", "N/A")
-                                        
-                                        history_text += (
-                                            f"### Week Beginning: {week_lbl}\n"
-                                            f"- **Growth Tier**: {tier}\n"
-                                            f"- **Tickets Completed**: {comp} / {exp}\n"
-                                            f"- **QA First-Pass %**: {qa}%\n"
-                                            f"- **Self-Rating**: {rat} / 5\n"
-                                            f"- **Key Achievements**: {ach}\n"
-                                            f"- **Challenges**: {chall}\n\n"
-                                        )
-                                        
-                                    prompt = (
-                                        f"You are an expert HR Talent Specialist and Agile Performance Coach. "
-                                        f"You are analyzing the performance of a software talent named {talent_name} based on their last {len(recent_submissions)} weeks of self-reported check-ins.\n\n"
-                                        f"Here is their performance history:\n"
-                                        f"{history_text}\n"
-                                        f"Based on this data, provide a professional, constructive, and actionable assessment including:\n"
-                                        f"1. **Executive Performance Summary**: A brief, encouraging 3-4 sentence paragraph summarizing their recent progress, work rate, and highlights.\n"
-                                        f"2. **Risk & Trajectory Assessment**: Identify any warning signs (such as a drop in tickets, low QA first-pass, repetitive achievements, or signs of 'Silent Struggle' or plateauing). Be objective.\n"
-                                        f"3. **Tailored Manager Coaching Tips**: Give 3 highly practical, specific coaching points or questions for the manager to use in their next 1-on-1 with {talent_name} to help them grow and level up.\n\n"
-                                        f"Formatting Guidelines: Use clear markdown headers, bold bullet points, and maintain a supportive but professional corporate tone. Keep the advice tailored specifically to the metrics and text they wrote."
-                                    )
-                                    
-                                    # Call Gemini API
-                                    model = genai.GenerativeModel("gemini-1.5-flash")
-                                    response = model.generate_content(prompt)
-                                    st.session_state[f"ai_summary_{selected}"] = response.text
-                            except Exception as ex:
-                                st.error(f"Gemini API Error: {ex}")
-                                st.info("Tip: Double-check your API key and network connection.")
-                                
-                    # Display the cached or newly generated summary
-                    if st.session_state[f"ai_summary_{selected}"]:
-                        st.markdown(
-                            '<div style="background-color:#f8fafc; border-left: 4px solid #585ba6; '
-                            'padding: 1.5rem; border-radius: 8px; margin: 1rem 0; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">'
-                            f'{st.session_state[f"ai_summary_{selected}"]}'
-                            '</div>',
-                            unsafe_allow_html=True
-                        )
-        st.markdown("---")
-
-    # ── Chronological Progress Table ────────────────────────────────────────
-    st.subheader("Chronological Progress History")
-    st.caption("A consolidated timeline of metrics and weekly check-in entries across all weeks.")
-    st.markdown(_df_to_html_table(progress_table_df), unsafe_allow_html=True)
-
-    if not weeks_df.empty:
-        # --- Person-level aggregate summary checks ---
-        st.markdown("---")
-        summary = person_summary_checks(weeks_df)
-        if summary:
-            st.subheader("At a glance")
-            for c in summary:
-                _render_check(c)
-            st.markdown("---")
-                    
-        # --- 3. Full Deep Logs (Paginated Modal) ---
-        st.markdown("---")
-        
         @st.dialog("Detailed Weekly Submissions", width="large")
         def show_submissions_modal(w_df):
             total_pages = len(w_df)
@@ -1890,6 +1767,12 @@ elif view_mode == "talent_profiles":
             show_submissions_modal(weeks_df)
     else:
         st.info("No detailed check-in submissions have been submitted by this talent yet.")
+
+    st.markdown("---")
+    # ── Chronological Progress Table ────────────────────────────────────────
+    st.subheader("Chronological Progress History")
+    st.caption("A consolidated timeline of metrics and weekly check-in entries across all weeks.")
+    st.markdown(_df_to_html_table(progress_table_df), unsafe_allow_html=True)
 
 # --- VIEW: TEAM DIRECTORY (GDOC) ---
 elif view_mode == "team_directory":
