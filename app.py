@@ -197,7 +197,7 @@ except Exception:
 st.set_page_config(
     page_title="Talent management weekly overview",
     page_icon="icon.png",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
