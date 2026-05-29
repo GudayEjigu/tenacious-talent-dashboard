@@ -195,7 +195,7 @@ except Exception:
     ]
 
 st.set_page_config(
-    page_title="Talent management weekly overview",
+    page_title="Talent Management Weekly Overview",
     page_icon="icon.png",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -206,6 +206,10 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+        text-decoration: none !important;
+    }
     
     html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"], [data-testid="stHeader"], [data-testid="stMarkdownContainer"], button, input, select, textarea, table, td, th, p, h1, h2, h3, h4, h5, h6 {
         font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -265,6 +269,11 @@ st.markdown(
         .talent-grid {
             grid-template-columns: 1fr;
         }
+        [data-testid="block-container"], .block-container {
+            max-width: 100% !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
     }
     p, span, li, td, th, div, a {
         font-size: 0.74rem !important;
@@ -277,8 +286,9 @@ st.markdown(
         background-color: #ffffff !important;
     }
 
-    [data-testid="block-container"] {
-        max-width: 95% !important;
+    [data-testid="block-container"], .block-container {
+        max-width: 70% !important;
+        margin: 0 auto !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
     }
@@ -1117,7 +1127,7 @@ if view_mode == "weekly_status":
         formatted_week_title = f"Week {active_week_str}"
         
     # Title & Pagination Header
-    st.title("Talent management weekly overview")
+    st.title("Talent Management Weekly Overview")
     st.caption("Weekly telegram bot data")
     
     col_prev, col_title, col_next = st.columns([1.5, 4, 1.5])
@@ -1306,7 +1316,7 @@ if view_mode == "weekly_status":
                 elif header == "Attachment":
                     val_str = str(val).strip()
                     if val_str and val_str.startswith("http"):
-                        link_html = f'<a href="{html.escape(val_str)}" target="_blank" style="color: #3b82f6; font-weight: 600; text-decoration: underline; display: block; padding: 12px 16px;">Open Link</a>'
+                        link_html = f'<a href="{html.escape(val_str)}" target="_blank" style="color: #3b82f6; font-weight: 600; text-decoration: none; display: block; padding: 12px 16px;">Open Link</a>'
                         html_lines.append(f'        <td>{link_html}</td>')
                     else:
                         cell_html = f'<a href="/?selected_talent={email}" target="_self" class="cell-link">{html.escape(val_str)}</a>'
@@ -1401,7 +1411,7 @@ if view_mode == "weekly_status":
 
 # --- VIEW: TALENT PROFILES ---
 elif view_mode == "talent_profiles":
-    st.markdown("### Select Talent Profile")
+    st.title("Select Talent Profile")
     
     # Build client-talent mappings dynamically
     talent_to_client = {e: TALENT_ROSTER[e]["client"] for e in people}
@@ -1821,13 +1831,13 @@ elif view_mode == "team_directory":
     <div style="display: flex; gap: 24px; margin-top: 16px; margin-bottom: 32px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border-radius: 20px; padding: 28px; box-shadow: 0 15px 35px rgba(79, 70, 229, 0.25); position: relative; overflow: hidden; color: white; transition: transform 0.2s ease-in-out;">
             <div style="position: absolute; top: -10px; right: -15px; font-size: 9rem; opacity: 0.15; line-height: 1; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">👨‍💻</div>
-            <h4 style="text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; margin-top: 0; font-family: 'Inter', sans-serif; color: white !important;">Total Active Talents</h4>
-            <h1 style="font-weight: 800; line-height: 1; margin: 0; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1); color: white !important;">{num_talents}</h1>
+            <div style="text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; margin-top: 0; font-family: 'Inter', sans-serif; font-size: 1.25rem !important; color: white !important;">Total Active Talents</div>
+            <div style="font-weight: 800; line-height: 1; margin: 0; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1); font-size: 2.5rem !important; color: white !important;">{num_talents}</div>
         </div>
         <div style="flex: 1; min-width: 250px; background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); border-radius: 20px; padding: 28px; box-shadow: 0 15px 35px rgba(13, 148, 136, 0.25); position: relative; overflow: hidden; color: white; transition: transform 0.2s ease-in-out;">
             <div style="position: absolute; top: -10px; right: -15px; font-size: 9rem; opacity: 0.15; line-height: 1; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">🏢</div>
-            <h4 style="text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; margin-top: 0; font-family: 'Inter', sans-serif; color: white !important;">Total Active Clients</h4>
-            <h1 style="font-weight: 800; line-height: 1; margin: 0; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1); color: white !important;">{num_clients}</h1>
+            <div style="text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; opacity: 0.9; margin-bottom: 12px; margin-top: 0; font-family: 'Inter', sans-serif; font-size: 1.25rem !important; color: white !important;">Total Active Clients</div>
+            <div style="font-weight: 800; line-height: 1; margin: 0; font-family: 'Inter', sans-serif; text-shadow: 0px 2px 4px rgba(0,0,0,0.1); font-size: 2.5rem !important; color: white !important;">{num_clients}</div>
         </div>
     </div>
     """
