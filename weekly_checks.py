@@ -63,6 +63,14 @@ def submission_timing(row: pd.Series) -> Check:
 def _pct(val) -> float | None:
     if val is None or (isinstance(val, float) and pd.isna(val)):
         return None
+        
+    s = str(val).strip().lower()
+    if s == "excellent": return 5.0
+    elif s == "above average": return 4.0
+    elif s == "average": return 3.0
+    elif s == "below average": return 2.0
+    elif s == "poor": return 1.0
+        
     try:
         return float(val)
     except (TypeError, ValueError):

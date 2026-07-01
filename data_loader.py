@@ -127,9 +127,16 @@ def _coerce_types(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     if "timestamp" in df.columns:
         df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=True, errors="coerce")
-    for col in ("tickets_completed", "tickets_expected", "overall_rating"):
+    for col in ("tickets_completed", "tickets_expected"):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
+    
+    if "overall_rating" in df.columns:
+        rating_map = {"excellent": 5.0, "above average": 4.0, "average": 3.0, "below average": 2.0, "poor": 1.0}
+        str_ratings = df["overall_rating"].astype(str).str.strip().str.lower()
+        mapped_ratings = str_ratings.map(rating_map)
+        numeric_ratings = pd.to_numeric(df["overall_rating"], errors="coerce")
+        df["overall_rating"] = mapped_ratings.combine_first(numeric_ratings)
     if "qa_first_pass_pct" in df.columns:
         df["qa_first_pass_pct"] = (
             df["qa_first_pass_pct"]
@@ -280,7 +287,18 @@ def _parse_csv_text(text: str) -> tuple[pd.DataFrame, CsvParseInfo]:
 
 @st.cache_data(ttl=300, show_spinner="Loading sheet data…")
 def load_from_csv_url(url: str) -> tuple[pd.DataFrame, CsvParseInfo]:
-    text = _fetch_csv_text(url)
+    try:
+        text = _fetch_csv_text(url)
+    except Exception as e:
+        import os
+        fallback_path = "checkins_fallback.csv"
+        if os.path.exists(fallback_path):
+            print(f"Error fetching sheet online, loading offline fallback: {e}")
+            with open(fallback_path, "r", encoding="utf-8-sig") as f:
+                text = f.read()
+        else:
+            raise e
+
     if text.lstrip().lower().startswith("<!doctype") or "<html" in text[:500].lower():
         raise ValueError(
             "This URL returned HTML, not CSV. Use a published CSV link ending in "

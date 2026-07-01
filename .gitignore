@@ -4,3 +4,5 @@ __pycache__/
 .venv/
 venv/
 .env
+checkins_fallback.csv
+email_aliases.csv
